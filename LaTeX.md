@@ -14,7 +14,7 @@
 | `\qquad`     | 双倍空格（`2 em`） | `a\qquad b` → $a\qquad b$           |
 
 | 常用字符| 公式 | 实例 |
-| ------ | ---- | ---------- |
+| :------: | :----: | :----------: |
 | 乘号 | `\times` | `a \times b` -> $a \times b$ |
 | 点乘 | `\cdot` | `a \cdot b` -> $a \cdot b$ |
 | 除号 | `\div` | `a \div b` -> $a \div b$ |
@@ -35,6 +35,8 @@
 | 向下取整 | `\lfloor\rfloor` | `$\lfloor\frac{a}{b}\rfloor$` -> $\lfloor\frac{a}{b}\rfloor$ |
 | 无穷大 | `\infty` | `\infty` -> $\infty$ |
 | 右箭头 | `\to` | `\to` -> $\to$ |
+| 合取 | `\land` | `\land` -> $\land$ |
+| 析取 | `\vee` | `\vee` -> $\vee$ |
 
 ### 多行LaTeX公式对齐
 
