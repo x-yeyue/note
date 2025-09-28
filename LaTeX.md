@@ -23,6 +23,7 @@
 | 大于 | `>`或`\gt` | `a \gt b` -> $a \gt b$ |
 | 小于等于 | `\leq`或`\le` | `a \leq b` -> $a \leq b$ |
 | 大于等于 | `\geq`或`\ge` | `a \geq b` -> $a \geq b$ |
+| 约等于 | `\approx` | `\approx` -> $\approx$ |
 | 不等于 | `\neq`或`\ne` | `a \neq b` -> $a \neq b$ |
 | 恒等于 | `\equiv` |  $\equiv$ |
 | 同余 | `\pmod{n}` | `a \equiv b \pmod{n}` ->  $a \equiv b \pmod{n}$ |
@@ -32,11 +33,14 @@
 | 整除 | `\mid` |`a \mid b` -> $a \mid b$ |
 | 不能整除 | `\nmid` |`a \nmid b` -> $a \nmid b$ |
 | 相似 | `\sim` | `a \sim b` -> $a \sim b$ |
+| 根号 | `\sqrt{}` 或 `\sqrt[]{}` | `\sqrt{x}` -> $\sqrt{x}$ `\sqrt[n]{x}` -> $\sqrt[n]{x}$ |
 | 向下取整 | `\lfloor\rfloor` | `$\lfloor\frac{a}{b}\rfloor$` -> $\lfloor\frac{a}{b}\rfloor$ |
 | 无穷大 | `\infty` | `\infty` -> $\infty$ |
 | 右箭头 | `\to` | `\to` -> $\to$ |
 | 合取 | `\land` | `\land` -> $\land$ |
 | 析取 | `\vee` | `\vee` -> $\vee$ |
+| 组合 | `\binom{}{}` | `\binom{n}{m}` -> $\binom{n}{m}$ |
+| 大号组合 | `\dbinom{}{}` | `\dbinom{n}{m}` -> $\dbinom{n}{m}$ |
 
 ### 多行LaTeX公式对齐
 
