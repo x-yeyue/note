@@ -27,6 +27,47 @@
 
 ---
 
+# 链式前向星
+
+```c++
+// 最大节点数
+const int MAXN = 10 + 5;
+// 最大边数
+const int MAXM = 20 + 5;
+int head[MAXN]; // idx:节点号   val:边的编号id
+// 有向图
+int nxt[MAXM]; // idx:边的编号id   val:下一条同起点边的编号
+// 无向图
+// int next[MAXM << 1]; 
+int to[MAXM];   // idx:边的编号id   val:节点号
+// int w[MAXM];    // idx:边的编号id   val:边的权重
+int id = 1; // 边的编号
+void add_edge(int _u, int _v){    // _u->_v
+    nxt[id] = head[_u];
+    to[id] = _v;
+    head[_u] = id ++;
+}
+// void add_edge(int _u, int _v, int _w){ // _u->_v, weight = _w
+//     nxt[id] = head[_u];
+//     to[id] = _v;
+//     w[id] = _w;
+//     head[_u] = id ++;
+// }
+
+/*
+// 遍历 u 的所有后继节点
+for(int i = head[u]; !i; i = nxt[i]){
+    int v = to[i]; // u->v
+    // int val = weight[i] // u->v的权重
+}
+*/
+
+// memset(head, 0, sizeof(head));
+```
+
+
+---
+
 # 字符串哈希
 
 ## 性质
@@ -1143,7 +1184,7 @@ void printTree(){ // 输出线段树每个节点的值
 }
 
 void init(){
-    tree.reserve(N * 4);
+    tree.resize(N * 4);
     arr.resize(N + 1);
     tag.resize(N * 4, 0);
     for(ll i = 1; i <= N; i ++){
