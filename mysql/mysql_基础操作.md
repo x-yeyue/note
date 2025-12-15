@@ -68,7 +68,7 @@
 
 - **\G** ：讲查询结果按列显示。
 
-![SHOW_ENGINES_\G](img/linux/SHOW_ENGINES_G.png "SHOW_ENGINES_\G.png")
+![SHOW_ENGINES_\G](img/mysql/SHOW_ENGINES_G.png "SHOW_ENGINES_\G.png")
 
 常用参数：
 
@@ -99,7 +99,7 @@ $MyISAM$ 存储引擎基于 $ISAM$，并对其进行扩展。
 3. **MEMORY**
 $MEMORY$ 存储引擎主要用于 ***内容变化不频繁*** 的表。
 由于 $MEMORY$ 存储引擎是**将数据存储到 *内存*** 中，所以 *太大的表无法使用此存储引擎*。
-对于 ***数据更新不频繁*、*存货周期不长* 和 *需要对数据统计结果进行分析*** 的数据表可以使用 $MEMORY$ 存储引擎。
+对于 ***数据更新不频繁*、*存货周期不长* 和 *需要对数据统计结果进行z分析*** 的数据表可以使用 $MEMORY$ 存储引擎。
 
 ### 数据类型
 

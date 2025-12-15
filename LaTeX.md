@@ -13,34 +13,43 @@
 | `\quad`      | 标准空格（`1 em`） | `a\quad b` → $a\quad b$             |
 | `\qquad`     | 双倍空格（`2 em`） | `a\qquad b` → $a\qquad b$           |
 
-| 常用字符| 公式 | 实例 |
-| :------: | :----: | :----------: |
-| 乘号 | `\times` | `a \times b` -> $a \times b$ |
-| 点乘 | `\cdot` | `a \cdot b` -> $a \cdot b$ |
-| 除号 | `\div` | `a \div b` -> $a \div b$ |
-| 分数 | `\frac{}{}` | `\frac{a}{b}` -> $\frac{a}{b}$ |
-| 小于 | `<`或`\lt` | `a \lt b` -> $a \lt b$ |
-| 大于 | `>`或`\gt` | `a \gt b` -> $a \gt b$ |
-| 小于等于 | `\leq`或`\le` | `a \leq b` -> $a \leq b$ |
-| 大于等于 | `\geq`或`\ge` | `a \geq b` -> $a \geq b$ |
-| 约等于 | `\approx` | `\approx` -> $\approx$ |
-| 不等于 | `\neq`或`\ne` | `a \neq b` -> $a \neq b$ |
-| 恒等于 | `\equiv` |  $\equiv$ |
-| 同余 | `\pmod{n}` | `a \equiv b \pmod{n}` ->  $a \equiv b \pmod{n}$ |
-| 属于 | `\in` | `a \in b` -> $a \in b$|
-| 累加 | `\sum` | `\sum_{i=1}^{n} a_{i}` -> $\sum_{i=1}^{n} a_{i}$ |
-| 累乘 | `\prod` | `\prod_{i=1}^{n} a_{i}` -> $\prod_{i=1}^{n} a_{i}$ |
-| 整除 | `\mid` |`a \mid b` -> $a \mid b$ |
-| 不能整除 | `\nmid` |`a \nmid b` -> $a \nmid b$ |
-| 相似 | `\sim` | `a \sim b` -> $a \sim b$ |
-| 根号 | `\sqrt{}` 或 `\sqrt[]{}` | `\sqrt{x}` -> $\sqrt{x}$ `\sqrt[n]{x}` -> $\sqrt[n]{x}$ |
-| 向下取整 | `\lfloor\rfloor` | `$\lfloor\frac{a}{b}\rfloor$` -> $\lfloor\frac{a}{b}\rfloor$ |
-| 无穷大 | `\infty` | `\infty` -> $\infty$ |
-| 右箭头 | `\to` | `\to` -> $\to$ |
-| 合取 | `\land` | `\land` -> $\land$ |
-| 析取 | `\vee` | `\vee` -> $\vee$ |
-| 组合 | `\binom{}{}` | `\binom{n}{m}` -> $\binom{n}{m}$ |
-| 大号组合 | `\dbinom{}{}` | `\dbinom{n}{m}` -> $\dbinom{n}{m}$ |
+| 常用字符 |           公式            |                              实例                              |
+| :--: | :---------------------: | :----------------------------------------------------------: |
+|  乘号  |        `\times`         |                 `a \times b` -> $a \times b$                 |
+|  点乘  |         `\cdot`         |                  `a \cdot b` -> $a \cdot b$                  |
+|  除号  |         `\div`          |                   `a \div b` -> $a \div b$                   |
+|  分数  |       `\frac{}{}`       |                `\frac{a}{b}` -> $\frac{a}{b}$                |
+|  小于  |        `<`或`\lt`        |                    `a \lt b` -> $a \lt b$                    |
+|  大于  |        `>`或`\gt`        |                    `a \gt b` -> $a \gt b$                    |
+| 小于等于 |      `\leq`或`\le`       |                   `a \leq b` -> $a \leq b$                   |
+| 大于等于 |      `\geq`或`\ge`       |                   `a \geq b` -> $a \geq b$                   |
+| 约等于  |        `\approx`        |                    `\approx` -> $\approx$                    |
+| 不等于  |      `\neq`或`\ne`       |                   `a \neq b` -> $a \neq b$                   |
+| 恒等于  |        `\equiv`         |                           $\equiv$                           |
+|  同余  |       `\pmod{n}`        |       `a \equiv b \pmod{n}` ->  $a \equiv b \pmod{n}$        |
+|  属于  |          `\in`          |                    `a \in b` -> $a \in b$                    |
+|  累加  |         `\sum`          |       `\sum_{i=1}^{n} a_{i}` -> $\sum_{i=1}^{n} a_{i}$       |
+|  累乘  |         `\prod`         |      `\prod_{i=1}^{n} a_{i}` -> $\prod_{i=1}^{n} a_{i}$      |
+|  整除  |         `\mid`          |                   `a \mid b` -> $a \mid b$                   |
+| 不能整除 |         `\nmid`         |                  `a \nmid b` -> $a \nmid b$                  |
+|  相似  |         `\sim`          |                   `a \sim b` -> $a \sim b$                   |
+|  根号  | `\sqrt{}` 或 `\sqrt[]{}` |   `\sqrt{x}` -> $\sqrt{x}$ `\sqrt[n]{x}` -> $\sqrt[n]{x}$    |
+| 向下取整 |    `\lfloor\rfloor`     | `$\lfloor\frac{a}{b}\rfloor$` -> $\lfloor\frac{a}{b}\rfloor$ |
+| 无穷大  |        `\infty`         |                     `\infty` -> $\infty$                     |
+| 右箭头  |          `\to`          |                        `\to` -> $\to$                        |
+|  合取  |         `\land`         |                      `\land` -> $\land$                      |
+|  析取  |         `\vee`          |                       `\vee` -> $\vee$                       |
+|  并   |         `\cup`          |                       `\cup` -> $\cup$                       |
+|  交   |         `\cap`          |                       `\cap` -> $\cap$                       |
+|  组合  |      `\binom{}{}`       |               `\binom{n}{m}` -> $\binom{n}{m}$               |
+| 大号组合 |      `\dbinom{}{}`      |              `\dbinom{n}{m}` -> $\dbinom{n}{m}$              |
+| 自然链接 |        `\bowtie`        |                `a \bowtie b` -> $a \bowtie b$                |
+|  存在  |        `\exists`        |                `\exists_{a}` -> $\exists_{a}$                |
+|  任给  |        `\forall`        |                `\forall_{a}` -> $\forall_{a}$                |
+|  因为  |       `\because`        |                   `\because` -> $\because$                   |
+|  所以  |      `\therefore`       |                 `\therefore` -> $\therefore$                 |
+|  数集  |       `\mathbb{}`       |                 `\mathbb{N}` -> $\mathbb{N}$                 |
+|  文本  |        `\text{}`        |                `\text{文本内容}` -> $\text{文本内容}$                |
 
 ### 多行LaTeX公式对齐
 
