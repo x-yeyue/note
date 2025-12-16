@@ -1,2 +1,7 @@
+# cph文件
 *.cph
+
+# obsidian配置文件
 *.obsidian
+
+draft.md
