@@ -1,7 +1,7 @@
 # cph文件
-*.cph
+**.cph
 
 # obsidian配置文件
-*.obsidian
+**.obsidian
 
 draft.md
