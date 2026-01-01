@@ -1,2 +1,7 @@
-*.cph
-*.obsidian
+**.cph
+**.obsidian
+**.vscode
+
+draft.md
+try.cpp
+draft.cpp
