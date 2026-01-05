@@ -889,7 +889,39 @@ void merge_sort(int lf, int rt){
 3. 如果以上两点都成立，那么该问题很可能被归并分治解决。
 
 
+# lambda 表达式
 
+```c++
+[capture-list] (parameter-list) mutable -> return-type {
+	function-body;
+}
+```
+
+- `capture`: 捕获列表。捕获当前作用域的变量。
+- `parameter-list`: 参数列表。
+- `mutable`: 允许 lambda 内部修改 值捕获 的变量。
+- `return-type`: 返回值类型。
+- `function-body`: 函数体。
+
+|   捕获列表   |             含义              |
+| :------: | :-------------------------: |
+|   `[]`   |            空捕获。             |
+| `[var]`  |       值捕获，捕获变量`var`。        |
+| `[&var]` |            应用捕获             |
+|   `=`    |       默认捕获，捕获外层变量的副本。       |
+|  `[&]`   |      默认引用捕获，捕获外层变量的引用。      |
+| `[this]` | 类成员函数中使用，捕获当前对象的 `this` 指针。 |
+
+例：
+```c++
+void solve(void){
+	int a = 3, b = 4;
+	auto sum = [&](){
+		return a + b;
+	}
+	cout << sum();
+}
+```
 ---
 
 # 随记
