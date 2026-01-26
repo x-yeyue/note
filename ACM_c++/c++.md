@@ -640,31 +640,43 @@ signed main(void){
 > **求区间和。** 可以在 $O(nlogn)$ 的时间构建树状数组， $O(logn)$ 的时间更新指定节点数据和查询区间和。
 
 ```c++
-const int N = 1e5 + 10;
-int lowbit(int x){return x & -x;} // 获取二进制最后一个1后的数值，例如 110 -> 10 也就是6 -> 2
-/*
-注意！！！
-tree需要从索引 1 开始，否则 inx += lowbit(inx); inx 会进入死循环
-*/
-int tree[N];
-void add(int inx, int val){ // 更新元素a[x] += d;
-    while(inx <= N){
-        tree[inx] += val;
-        inx += lowbit(inx);
+template <typename T>
+struct BIT{
+    // 数组大小
+    int n; 
+    vector<T> tree;
+    inline int lowbit(int x){return x & -x;}
+
+    BIT(int sz) : n(sz), tree(sz + 1, T()){}
+
+    template <typename U>
+    void build(const vector<U>& arr){
+        for(int i = 0; i < n; i ++){
+	            update(i + 1, static_cast<T>(arr[i]));
+        }
     }
-}
-int get_pre(int x){ // 返回前缀和
-    int ans = 0;
-    while(x > 0){
-        ans += tree[x];
-        x -= lowbit(x);
+
+    void update(int idx, T val){
+        for(; idx <= n; idx += lowbit(idx)){
+            tree[idx] += val;
+        }
     }
-    return ans;
-}
-int sum(int lf, int rt){ // 获取[lf, rt]的范围和
-    return get_pre(rt) - get_pre(lf - 1);
-}
+
+    T query(int idx){
+        T res = T();
+        for(; idx > 0; idx -= lowbit(idx)){
+            res += tree[idx];
+        }
+        return res;
+    }
+    
+    T range_query(int lf, int rt){
+        if(lf > rt || lf < 1 || rt > n) return 0;
+        return query(rt) - query(lf - 1);
+    }
+};
 ```
+
 
 ---
 
