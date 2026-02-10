@@ -53,6 +53,8 @@
 
 # 配置c++环境
 
+**注意:** 文件名不能包含中文，否则会报错。
+
 预定义变量:
 - `${file}` : 当前打开的代码文件。
 - `${fileDirname}` : 当前文件所在目录。
@@ -108,16 +110,12 @@
             // 当前编译方案名
             "label": "build cpp to bin",
             // 指定要执行的编译工具
-            "command": "powershell.exe",  // powershell
+            "command": "g++",
             // 编译命令给参数数组
             "args": [
-                // 让 PowerShell 执行后面的命令串
-                "-Command",
-                // 1. 用 -Force 创建 bin 目录（已存在则不报错）；2. 执行 g++ 编译
-                "mkdir -Force \"${workspaceFolder}\\bin\"; g++",
 	            // 生成包含调试信息的可执行文件(无则断点无效)
                 "-g3",
-                // 源文件:当前打开的代码文件
+                // 源文件:当前打开的代s码文件
                 "${file}",
                 // 指定输出可执行文件，和后面输出文件路径参数联系
                 "-o",
@@ -141,18 +139,16 @@
 			    // 不回显编译命令本身，仅显示编译结果（警告/错误）
 			    "echo": false 
             },
-            // 对编译任务进行进行分组归类和默认任务设置
             "group": {
-                // 任务分类归类
                 "kind": "build",
-                // 当前任务是否成为其所属分组的默认执行任务。
                 "isDefault": true
             },
             // 捕获编译过程中编译器输出的错误和警告信息
             // C/C++ 项目(GCC/g++/Clang)固定使用 "$gcc"，MSVC 编译器使用 "$msvc"
             "problemMatcher": [
                 "$gcc"
-            ]
+            ],
+            "detail": "生成编译文件,输出到 bin 目录下。"
         },
         {
             // 任务执行类型(shell/process)
@@ -238,14 +234,14 @@
   "configurations": [
     {
 	    // 当前调试方案名
-      "name": "Debug C++",
+      "name": "build cpp to bin",
       // 调试器类型(固定)
       "type": "cppdbg",
       // 调试请求类型(launch/attach)
       "request": "launch",
       // 待调试的可执行文件路径
       // "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
-      "program": "${workspaceFolder}/bin/${fileBasenameNoExtension}.exe",
+      "program": "${workspaceFolder}\\bin\\${fileBasenameNoExtension}.exe",
       // 程序运行的命令行参数
       "args": [],
       // 是否在程序入口处暂停(main 处，方便调试)
