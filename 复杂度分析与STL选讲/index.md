@@ -1,3 +1,12 @@
+---
+title: 复杂度分析与STL选讲
+date: 2026-04-03 21:40:30
+updated: 2026-04-12 10:59:43
+categories: 课件
+tags: 
+  - 课件
+  - algorithm
+---
 # 复杂度分析与STL选讲+数据结构
 
 ## 时间复杂度
@@ -104,14 +113,10 @@ void solve(void){
 */
 ```
 
-`arr`
-
-```c++
-
-```
 
 
 ### 例一
+
 ```c++
 void solve(void){
     vector<int> arr = {6, 7, 3, 12, 91, 55};
@@ -165,7 +170,7 @@ $$
 
 时间复杂度: **$O\left(nlog_{2}n\right) \to O\left(nlogn\right)$**
 
-> **调和级数**： $\frac{1}{1} + \frac{1}{2} + \frac{1}{3} + \cdots + \frac{1}{n} \to $ **$log_{2}n$**
+> **调和级数**：  $\frac{1}{1} + \frac{1}{2} + \frac{1}{3} + \cdots + \frac{1}{n} \to log_{2}n$
 
 ## 常见的复杂度一览
 
@@ -190,13 +195,13 @@ $O(1),\; O(logn),\; O(\sqrt{n}),\; O(n),\; O(nlogn),\; O(n^{2}), \cdots, O(n^{k}
 c++中使用 $cin$ 和 $cout$ 输入输出的效率是很慢的。
 
 [例子](https://www.matiji.net/exam/brushquestion/3/4581/7948FA869678083D1D01ACAA1ABCFB0B?from=brushNoi)
-![题目](img//复杂度分析与STL选讲//题目.png "题目.png")
+![题目](./题目.png "题目.png")
 
-![数据范围](img/复杂度分析与STL选讲/题目_数据范围.png "数据范围.png")
+![数据范围](./题目_数据范围.png "数据范围.png")
 
-![submit_TLE](img/复杂度分析与STL选讲/submit_TLE.png "submit_TLE.png")
+![submit_TLE](./submit_TLE.png "submit_TLE.png")
 
-![submit_AC](img/复杂度分析与STL选讲/submit_AC.png "submit_AC.png")
+![submit_AC](./submit_AC.png "submit_AC.png")
 
 ```c++
 // 关闭 cin/cout 与 C 语言 stdio（如 scanf/printf）的同步机制，消除冗余开销。
@@ -536,12 +541,12 @@ void solve(void){
 
 #### 时间复杂度
 
-| 操作 | 单链表 | 双向链表 |
-| :----: | :----: | :----: |
-| 表头插入/删除 | $O(1)$ | $O(1)$ |
-| 表尾插入/删除 | $O(n)$ | $O(1)$ |
-| 中间插入/删除(已知节点) | $O(1)$ | $O(1)$ |/BFS）
-| 查找指定元素 | $O(n)$ | O(n) |
+|      操作       |  单链表   |  双向链表  |
+| :-----------: | :----: | :----: |
+|    表头插入/删除    | $O(1)$ | $O(1)$ |
+|    表尾插入/删除    | $O(n)$ | $O(1)$ |
+| 中间插入/删除(已知节点) | $O(1)$ | $O(1)$ |
+|    查找指定元素     | $O(n)$ |  O(n)  |
 
 ### 树
 
