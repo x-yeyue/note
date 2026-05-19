@@ -48,7 +48,7 @@ Git分支是一个独立的工作流，使用分支，开发者可以互相隔�
     - `git switch -c dev`: 创建新分支 `dev` 并切换到该分支。
 
 - `git branch`: 显示所有的本地分支。
-    
+  
     - `git branch dev`: 创建一个新分支 `dev`。
     - `git branch -d dev`: 删除分支 `dev`。当该分支未合并到当前分支时会报错，拒绝删除。
     - `git branch -D dev`: 不做任何检查强制删除分支 `dev`。有较高风险。
@@ -80,6 +80,35 @@ Git分支是一个独立的工作流，使用分支，开发者可以互相隔�
 `git restore 文件名`: 丢弃工作区的修改。
 
 `git restore --staged 文件名`: 取消暂存文件。
+
+## 文件储藏
+
+> `git stash` 用于临时保存工作目录和暂存区的修改。当你需要 *紧急切换分支*、*拉取更新*、*修复bug*等情况，而 **当前修改尚未完成** 又 **不想提交** 时非常有用。
+>
+> 储藏区是一个独立的栈空间，且独立于所有分支，你可以在任何分支上 `apply` `pop` 任何储藏，在需要时也可以将其应用于任何分支(*回滚也不会修改已有的储藏*)。
+
+**基本用法:**
+
+`git stash [push] [-m <message>] [-u] [-a] [-k] [--] [<pathspec>...]`
+
+**常用命令:**
+
+- `git stash`: 等同于 `git stash push`，保存所有*已跟踪*的修改(工作区+暂存区)。
+- `git stash -m "message"`: 保存修改并*添加描述信息*。
+- `git stash -u`: 同时保存*未跟踪*的文件(新建的文件)。
+- `git stash -a`: 保存*所有文件*(包括被`.gitignore`忽略的文件)。
+- `git stash -k`: 保存修改，且保留*暂存区状态*(`git add` 过的内容仍留在暂存区)。
+- `git stash --<pathspac>`: 只保存符合路径模式的文件的修改。
+- `git stash --staged`: 只保存暂存区的修改。
+- `git stash list`: 列出所有储藏。
+- `git stash show [<stash>]`: 显示储藏的修改摘要(加`-p`显示详细)。
+- `git stash apply [<stash>]`: 应用储藏到当前工作区，不删除储藏。
+- `git stash pop [<stash>]`: 应用储藏并*删除*储藏(如果应用成功)。
+- `git stash drop [<stash>]`: 删除指定储藏(默认为最新的)。
+- `git stash clear`: 删除所有储藏。
+- `git stash branch <branch> [<stash>]`: 基于储藏创建一个新分支，并切换到该分支。
+
+> `<stash>` 代表储藏的对象。`stash@{0}`代表最新的储藏，`stash@{1}`表示次新的，依此类推。
 
 
 
