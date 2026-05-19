@@ -44,16 +44,20 @@ Git分支是一个独立的工作流，使用分支，开发者可以互相隔�
     可以通过 `git reflog` 尝试查看 `git` 操作记录来找回。
 
 - `git commit -m “说明信息”`: 把修改提交到仓库。 `-m`后面跟本次提交的说明信息。应明确此次提交进行了那些变动，比如增加了哪些新功能，还是修复了某些bug。例如`git commit -m "x_yeyue完成开发V1"`。
+
+    - `git commit --amend -m "新说明信息"`: 修改*刚刚* `commit` 的描述信息(*尚未推送*)。
+
 - `git switch dev`: 切换到已有分支 `dev`。
+
     - `git switch -c dev`: 创建新分支 `dev` 并切换到该分支。
 
 - `git branch`: 显示所有的本地分支。
-  
+
     - `git branch dev`: 创建一个新分支 `dev`。
     - `git branch -d dev`: 删除分支 `dev`。当该分支未合并到当前分支时会报错，拒绝删除。
     - `git branch -D dev`: 不做任何检查强制删除分支 `dev`。有较高风险。
     - `git branch -m <old_branch> <new_branch>`: 重命名分支名。
-    
+
 - `git merge --no-ff -m “说明信息” 开发分支`: 合并分支。`--no-ff`可以更好的保留历史记录。执行该命令会自动生成一个提交。
 
 ### 远程仓库
