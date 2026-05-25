@@ -118,16 +118,16 @@ Git分支是一个独立的工作流，使用分支，开发者可以互相隔�
 
 # 命名规范
 
-| 分支类型          | 命名格式                   | 示例                                           | 说明                                                         |
-| :---------------- | :------------------------- | :--------------------------------------------- | :----------------------------------------------------------- |
-| **主分支**        | `main` / `master`          | `main`                                         | 生产就绪代码，只接受合并，不直接提交                         |
-| **开发集成分支**  | `develop`                  | `develop`                                      | 集成最新功能，准备发布（可选，Git Flow 使用）                |
-| **功能分支**      | `feature/<描述>`           | `feature/user-login` `feature/payment-gateway` | 从 `develop` 或 `main` 切出，完成后合并回                    |
-| **修复分支**      | `fix/<描述>`               | `fix/login-error` `fix/null-pointer`           | 修复非紧急缺陷                                               |
-| **热修复分支**    | `hotfix/<描述>`            | `hotfix/critical-patch` `hotfix/security-vuln` | 从 `main` 切出，修复生产紧急问题，合并回 `main` 和 `develop` |
-| **发布分支**      | `release/<版本号>`         | `release/v1.2.0` `release/2026-05-18`          | 准备发布，最后调整版本号、文档，合并回 `main` 和 `develop`   |
-| **实验/探索分支** | `experiment/<描述>`        | `experiment/new-arch`                          | 用于验证想法，不保证合并                                     |
-| **版本标签**      | `v<major>.<minor>.<patch>` | `v2.3.1`                                       | 不是分支，是 Git 标签（tag），用于标记发布点                 |
+| 分支类型        | 命名格式                       | 示例                                             | 说明                                          |
+| :---------- | :------------------------- | :--------------------------------------------- | :------------------------------------------ |
+| **主分支**     | `main` / `master`          | `main`                                         | 生产就绪代码，只接受合并，不直接提交                          |
+| **开发集成分支**  | `develop`                  | `develop`                                      | 集成最新功能，准备发布（可选，Git Flow 使用）                 |
+| **功能分支**    | `feature/<描述>`             | `feature/user-login` `feature/payment-gateway` | 从 `develop` 或 `main` 切出，完成后合并回              |
+| **修复分支**    | `fix/<描述>`                 | `fix/login-error` `fix/null-pointer`           | 修复非紧急缺陷                                     |
+| **热修复分支**   | `hotfix/<描述>`              | `hotfix/critical-patch` `hotfix/security-vuln` | 从 `main` 切出，修复生产紧急问题，合并回 `main` 和 `develop` |
+| **发布分支**    | `release/<版本号>`            | `release/v1.2.0` `release/2026-05-18`          | 准备发布，最后调整版本号、文档，合并回 `main` 和 `develop`      |
+| **实验/探索分支** | `experiment/<描述>`          | `experiment/new-arch`                          | 用于验证想法，不保证合并                                |
+| **版本标签**    | `v<major>.<minor>.<patch>` | `v2.3.1`                                       | 不是分支，是 Git 标签（tag），用于标记发布点                  |
 
 
 
