@@ -43,3 +43,13 @@
    只有服务器正常关闭时，才会执行 `destroy` 方法。
    具体的，`destroy` 方法在 Servlet 被销毁之前执行，一般用于释放资源。
 
+## Servlet3.0
+
+支持注解配置。可以不用 `web.xml` 了。
+
+**步骤**:
+1. 创建 `JavaEE` 项目，选择 Servlet 的版本 3.0 以上，可以不创建 `web.xml`
+2. 定义一个类，实现 Servlet 接口
+3. 复写方法
+4. 在类上使用 `@WebServlet` 注解，进行配置
+   `@WebServlet("/demo")`
