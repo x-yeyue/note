@@ -104,3 +104,12 @@ HttpServlet -- 抽象类
 
 继承 `HttpServlet` 后仅需重写 `doGet` 或 `doPost` 方法。
 
+## Servlet 相关配置
+
+1. `urlpartten`: Servlet 访问路径
+   一个 Servlet 可以定义多个访问路径: `@WebServlet({"/demo3", "/dd4"})`
+   
+   路径定义规则:
+   - `/xxx`
+   - `/xxx/xxx`
+   - \*.do
