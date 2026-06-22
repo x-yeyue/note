@@ -31,7 +31,7 @@
 1. 创建: 执行 `init` 方法，只执行一次
    -   Servlet 什么时候创建？
       - 默认情况下，第一次被访问时被创建
-         - 配置 Servlet 的创建时机
+         - 配置 Servlet 的创建时机(`web.xml`)
            ![Servlet生命周期init方法的执行时机](Servlet生命周期init方法的执行时机.png "Servlet生命周期init方法的执行时机.png")
 	- Servlet 的 `init` 方法，只执行一次，说明一个 Servlet 在内存中只存在一个对象，**Servlet 是单例的**
 		- 多个用户同时访问时，可能存在线程安全问题
@@ -53,3 +53,54 @@
 3. 复写方法
 4. 在类上使用 `@WebServlet` 注解，进行配置
    `@WebServlet("/demo")`
+
+## Servlet 的体系结构
+
+```text
+Servlet -- 接口
+	|
+	|
+GenericServlet -- 抽象类
+	|
+	|
+HttpServlet -- 抽象类
+```
+
+### Servlet 接口
+
+定义了，完整的生命周期方法。
+
+1. `init(ServletConfig config)`: 初始化方法
+   在 Servlet 被创建的时候执行，只执行一次，用于初始化 Servlet 的资源。
+2. `service(ServletRequest req, ServletResponse res)`: 提供服务方法
+   每一次 Servlet 被访问都会执行一次，用于处理请求和响应。
+3. `destroy()`: 销毁方法
+   在 Servlet 被正确销毁的时候执行，用于释放 Servlet 的资源。
+4. `getServletConfig()`: 获取 ServletConfig 对象
+   用于获取 Servlet 的配置信息，如参数值、初始化参数等。
+5. `getServletInfo()`: 获取 Servlet 的信息
+   用于获取 Servlet 的名称、版本号等信息。
+
+**痛点**: 每次都要重写所有方法，太繁琐。
+
+### GenericServlet 抽象类
+
+解决了 `Servlet` 接口的痛点。
+
+实现了 `Servlet` 接口，并完成以下任务:
+1. 将非核心的方法，默认空实现。
+2. 将 `service()` 方法声明为 `abstract` 抽象方法。
+   只需继承 `GenericServlet`，重写 `Service()` 方法即可，无需关注其他。
+
+**痛点**: 由于方法中拿到的为 `ServletRequest`，需要转换为 `HttpServletRequest` 才能拿到 会话、请求头等信息，较麻烦。
+
+### HttpServlet 抽象类
+
+解决了 `GenericServlet` 的痛点。
+
+`HttpServlet` 继承自 `GenericServlet`，针对 **HTTP协议** 做了封装:
+1. 重写 `service()` 方法: 自动解析了 HTTP 请求方法。
+2. 自动进行路由分发: 实现了 *分发逻辑* -- 如果是 GET 请求就调用 `doGet()` 方法;如果是 POST 请求，就调用 `doPost()` 方法。
+
+继承 `HttpServlet` 后仅需重写 `doGet` 或 `doPost` 方法。
+
