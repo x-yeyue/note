@@ -5,7 +5,7 @@
    `public class ServletDemo1 implements Servlet`
 3. 实现接口中的抽象方法
 4. 配置 Servelet
-   ```java
+   ```xml
    // 在 web.xml 中配置
     <servlet> 
 		<servlet-name>demo1</servlet-name> // name
@@ -113,3 +113,179 @@ HttpServlet -- 抽象类
    - `/xxx`
    - `/xxx/xxx`
    - \*.do
+
+## request 功能
+
+### 获取请求消息数据
+
+#### 获取请求行数据
+```text
+GET /ServletDemo/demo1?name=x_yeyue HTTP/1.1
+```
+
+获取 **请求方式**: `GET`
+```java
+String getMethod()
+```
+
+获取 **虚拟目录**: `/ServletDemo`
+```java
+String getContextPath()
+```
+
+获取 **Servlet 路径**: `/demo1`
+```java
+String getServletPath()
+```
+
+获取 **get 方法请求参数**: `name=x_yeyue`
+```java
+String getQueryString()
+```
+
+获取 **请求 URI**: `/ServletDemo/demo1`
+```java
+String getRequestURI()
+```
+
+获取 **请求 URL**: `http://localhost/ServletDemo/demo1`
+```java
+StringBuffer getRequestURL()
+```
+
+获取 **版本协议**: `HTTP/1.1`
+```java
+String getProtocol()
+```
+
+获取 **客户机的 IP 地址**:
+```java
+String getRemoteAddr()
+```
+
+#### 获取请求头数据
+
+```java
+// 获取所有的请求头名称
+Enumeration<String> getHeaderNames()
+
+// 通过请求头的名字 获取请求头的值
+String getHeader(String name)
+
+// 获取所有请求头名称  
+Enumeration<String> headerNames = req.getHeaderNames();  
+// 遍历所有请求头名称  
+while(headerNames.hasMoreElements()){  
+    String name = headerNames.nextElement();  
+    String value = req.getHeader(name);  
+    System.out.println(name + " -> " + value);  
+}
+```
+
+#### 获取请求体数据
+
+> 请求体只有 POST 请求方式，才有请求体，在请求体中封装了 POST 请求的请求参数。
+
+**步骤**: 
+1. 获取流对象
+   ```java
+    // 获取字符输入流，只能操作字符数据
+	BufferedReader getReader()
+   
+	// 获取字节输入流，可以操作所有类型数据
+	ServletInputStream getInputStream()
+   
+   
+	BufferedReader reader = req.getReader();  
+	String line = null;  
+	while((line = reader.readLine()) != null){  
+		System.out.println(line);  
+	}
+}
+   ```
+2. 再从流对象中拿数据
+
+### 其他功能
+
+#### 获取请求参数通用方法
+
+```java
+/*
+不论 GET 还是 POST 
+*/
+
+// 根据参数名称获取参数值  username=x_yeyue&password=123
+String getParameter(String name)
+
+// 根据参数名称获取参数值的数组  hobby=xx&hobby=game
+String[] getParameterValues(String name)
+
+// 获取所有请求的参数名称
+Enumeration<String> getParameterNames()
+
+// 获取所有参数的 map 集合
+Map<String, String[]> getParameterMap()
+```
+
+##### 中文乱码问题
+
+- get 方法: tomcat8 已经将 get 方法乱码问题解决。
+- post 方法: 在获取参数前，设置 request 的编码 `request.setCharacterEncoding("utf-8");`
+
+#### 请求转发
+
+**步骤**
+1. 通过 `request` 对象获取请求转发器对象
+   ```java
+   RequestDispatcher getRequestDispatcher(String path)
+   ```
+2. 使用 `RequestDispatcher` 对象来进行转发
+   ```java
+   forward(ServletRequest request, ServletResponse response)
+   ```
+
+```java
+@Override  
+protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {  
+    System.out.println("demo444444");  
+  
+    // 转发到 demo5  
+    req.getRequestDispatcher("/requestDemo5").forward(req, resp);  
+    System.out.println("demo444444 转发到 demo5");  
+  
+    /*  
+    RequestDispatcher dispatcher = req.getRequestDispatcher("/requestDemo5");   
+    dispatcher.forward(req, resp);     
+    */
+}
+```
+
+**特点**:
+1. 浏览器地址栏路径不发生变化
+2. 只能转发到当前服务器内部资源中
+3. 转发是一次请求
+
+#### 共享数据
+
+> **域对象**: 一个有作用范围的对象，可以在范围内共享数据
+
+`request`域: 一次请求的范围，一般用于请求转发的多个资源中共享数据
+
+```java
+// 存储数据
+void setAttribute(String name, Object obj)
+
+// 通过键获取值
+Object getAttitude(String name)
+
+// 通过键移除键值对
+void removeAttribute(String name)
+```
+
+#### 获取 ServletContext
+
+```java
+ServletContext getServletContext()
+```
+
+
