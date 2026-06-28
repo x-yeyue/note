@@ -160,3 +160,42 @@ public void removeAttribute(String name)
 ```
 
 **客户端**: 超链接
+
+## EL 表达式
+
+**作用**: 简化 JSP 代码。
+
+**格式**: `${域对象名称}`
+
+**操作对象**: 域对象，不能操作局部变量。
+
+**注**:
+1. 如若 EL 表达式获取域对象的值为空，默认显示空字符串。
+2. EL 表达式默认从小到大范围寻找，找到就返回，否则显示空字符串。
+3. 查找指定域对象的值
+   `pageScope`,`requestScope`,`sessionScope`,`applicaionScope`。
+   `${pageScope.username}` 依此类推。
+
+### 获取数据
+
+**获取List**
+```java
+// 获取 list 的 size
+${list.size()}
+
+// 获取 list 指定下标的值
+${list[index]}
+```
+
+**获取map**
+```java
+// 获取 map 中指定 key 的 value
+${map.key}
+${map["key"]}
+```
+
+**获取 javaBean**
+```java
+${user.id}
+${User.getId()} // 要提供对应的 get 方法
+```
