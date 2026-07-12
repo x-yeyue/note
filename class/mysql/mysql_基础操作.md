@@ -109,27 +109,84 @@ $MEMORY$ 存储引擎主要用于 ***内容变化不频繁*** 的表。
 |    INT    | $4$ 字节 |          -2147483648 ~ 2147483647          |      0 ~ 4294967295      |
 |  BIGINT   | $8$ 字节 | -9223372036854775808 ~ 9223372036854775807 | 0 ~ 18446744073709551615 |
 
+> **UNSIGNED 关键字**：在类型后加 `UNSIGNED` 可取消符号位，使整数只能存储非负数，从而扩大正数的存储范围。例如 `INT UNSIGNED` 的范围为 $0 \sim 4294967295$。
+
+> **显示宽度与 ZEROFILL**：类型后括号中的数字（如 `INT(5)`）仅影响显示宽度（配合 `ZEROFILL` 时用 `0` 填充），**不影响存储范围和实际存储大小**。`ZEROFILL` 会自动为该列添加 `UNSIGNED` 属性。
+
+#### 浮点类型
+
+> 浮点类型用于存储 **近似值**，存在精度损失，不适合存储精确数值（如金额）。
+
+|  数据类型   |  所占字节  |        精度说明         |          适用场景           |
+| :-----: | :----: | :-----------------: | :---------------------: |
+|  float  | $4$ 字节 |  短小数（约 $7$ 位有效数字）   |       精度要求不高的科学计算       |
+| double  | $8$ 字节 | 较长小数（约 $15$ 位有效数字）  |        精度要求较高的计算        |
+| decimal |  可变字节  | 精确小数（最大 $65$ 位有效数字） | **金额、价格等需要精确计算的场景（推荐）** |
+
+> **decimal 用法**：`decimal(M, D)` 其中 $M$ 为总位数（精度），$D$ 为小数位数（标度）。例如 `decimal(10, 2)` 表示最多 $10$ 位数字，其中 $2$ 位小数，即最大可存储 `99999999.99`。
+> **float/double vs decimal**：`float` 和 `double` 采用二进制浮点运算，存在精度丢失问题（例如 `0.1 + 0.2 != 0.3`）。涉及精确计算时**务必使用 `decimal`**。
+
+#### 字符串类型
+
+> 字符串类型用于存储文本数据。选择合适类型的关键在于：是否定长、数据量大小、是否需要全文检索。
+
+|    数据类型    |       存储方式        |        最大长度        |           说明           |     适用场景     |
+| :--------: | :---------------: | :----------------: | :--------------------: | :----------: |
+|    char    |     定长（不足补空格）     |      $255$ 字符      | 读取速度快，但浪费空间（始终占用声明的长度） |    固定长度文本    |
+|  varchar   | 变长（额外 $1$ 字节记录长度） | $65535$ 字节（受行大小限制） |     节省空间，最常用的字符串类型     | 变长文本（姓名、地址等） |
+|  tinytext  |        变长         |      $255$ 字符      |  与 tinyblob 类似，仅存储文本   |     短文本      |
+|    text    |        变长         |     $65535$ 字符     |  不能设置默认值，不参与索引（除前缀索引）  |  文章、评论等长文本   |
+| mediumtext |        变长         |   $16777215$ 字符    |         中等长度文本         |   较长的文本内容    |
+|  longtext  |        变长         |  $4294967295$ 字符   |          超长文本          |  小说、日志等超大文本  |
+
+> **char vs varchar**：
+> - `char(10)` 存储 `'abc'`，实际占用 $10$ 个字符的空间（末尾补空格）；存取时会**自动去除尾部空格**。
+> - `varchar(10)` 存储 `'abc'`，实际占用 $3 + 1 = 4$ 个字节（额外 $1$ 字节记录长度）。
+> - **char** 适合长度几乎不变的字段（如 MD5 值固定为 $32$ 位、性别代码 `M`/`F`）。
+> - **varchar** 适合长度变化较大的字段。
+
+> **binary / varbinary**：分别对应 `char` / `varchar` 的二进制版本，用于存储二进制数据（如文件内容、加密密钥）。
+
+#### 日期与时间类型
+
+|   数据类型    | 所占字节 |          格式           |            是否自动更新             |     适用场景      |
+| :-------: | :--: | :-------------------: | :---------------------------: | :-----------: |
+|   year    | 1 字节 |        `YYYY`         |               否               |     仅存储年份     |
+|   date    | 3 字节 |     `YYYY-MM-DD`      |               否               |  仅存储日期（生日等）   |
+|   time    | 3 字节 |      `HH:MM:SS`       |               否               |  仅存储时间（课程时间）  |
+| datetime  | 8 字节 | `YYYY-MM-DD HH:MM:SS` |               否               | 日期+时间（创建时间等）  |
+| timestamp | 4 字节 | `YYYY-MM-DD HH:MM:SS` | **是**（默认 `CURRENT_TIMESTAMP`） | 需要自动记录更新时间的场景 |
+
+> **datetime vs timestamp**：
+> - `datetime` 占 $8$ 字节，范围为 `1000-01-01 00:00:00` ~ `9999-12-31 23:59:59`，**不受时区影响**，存什么读什么。
+> - `timestamp` 占 $4$ 字节，范围为 `1970-01-01 00:00:01 UTC` ~ `2038-01-19 03:14:07 UTC`，**会随服务器时区转换**，存储时转为 UTC，读取时转为当前时区。
+> - 推荐用 `datetime` 存业务时间（如订单创建时间），用 `timestamp` 做记录追踪（如 `updated_at`）。
+
+> **自动初始化与更新**：`timestamp` 和 `datetime` 支持自动初始化和自动更新：
+> ```mysql
+> -- 创建时自动填充当前时间，更新时自动刷新
+> create_time datetime default current_timestamp comment '创建时间',
+> update_time datetime default current_timestamp on update current_timestamp comment '更新时间'
+> ```
 
 ## 数据库操作
 
+```mysql
+-- 查询 所有数据库
+show databases;
 
-### 创建数据库
+-- 查询 当前数据库
+select database();
 
-`CREATE database database_name;`
+-- 使用/切换 数据库
+user 数据库名;
 
-### 查看数据库
+-- 创建数据库
+create database [if not exists] 数据库名 [default charset utf8mb4];
 
-`SHOW DATABASES;`
-
-### 选择数据库
-
-`USE database_name;`
-
-### 删除数据库
-
-`DROP DATABASE database_name;`
-
-## 数据表操作
+-- 删除数据库
+drop database [if exists] 数据库名;
+```
 
 ### 约束条件
 
@@ -138,6 +195,7 @@ $MEMORY$ 存储引擎主要用于 ***内容变化不频繁*** 的表。
 - `not null / null`: 不允许为空 / 允许为空。
 - `unique`: 唯一性约束，不允许重复。
 - `default`: 缺省值约束，将字段中使用频率最高的字段值设置，为该列的缺省值。
+- `auto_increment`: 自增关键字。
 
 #### 表级完整性约束
 
@@ -152,31 +210,61 @@ $MEMORY$ 存储引擎主要用于 ***内容变化不频繁*** 的表。
 
 ```mysql
 create table [库名] 表名(
-	属性名 属性类型 [列级完整约束条件] 
+	属性名 属性类型 [列级完整约束条件] [comment 注释]
 	[, ...]
 	[, 表级完整性约束]
-);
+)[comment 表注释];
 ```
 
-### 查看表结构
 
-`descibe 表;`
+
+### 查看表
+
+```mysql
+-- 查询当前数据库的所有表
+show tables;
+
+-- 查询表结构
+descibe 表名;
+desc 表明;
+
+-- 查询建表语句
+show create table 表明;
+```
 
 ### 修改表结构
 
+```mysql
+-- 添加字段
+alter table 表名 add 字段名 类型 [comment 注释] [约束];
 
-- **修改表名**: `alter table 表原名 rename 新表名;`
-- **修改字段名**: `alter table 表名 change 原自字段名 新字段名 新数据类型;`
-- **修改字段的数据类型**: `alter table 表名 modify 字段名 数据类型;`
-- **增加字段**: `alter table 表名 add 字段名 数据类型;`
-- **删除字段**: `alter table 表名 drop 字段名;`
-- **增加主键**: `alter table 表名 add primary key (字段名 [,...])`
-- **增加外键约束**: `alter table 表名 add foreign key (外键字段名) references 对应主键所在表 (对应主键字段名) on 约束名;`
-- **删除外键约束**: `alter table 表名 drop foreign key 约束名;`
+-- 修改字段类型
+alter table 表名 modify 字段名 新数据类型;
+
+-- 修改字段名和字段类型
+alter table 表名 change 旧字段名 新字段名 类型 [comment 注释] [约束];
+
+-- 删除字段
+alter table 表名 drop column 字段名;
+
+-- 修改表名
+alter table 表名 rename to 新表名;
+
+-- 添加主键
+alter table 表名 add primary key (字段名 [, ...]);
+
+-- 添加外键约束
+alter table 表名 add foreign key (字段名) references 对应外键所在表(对应字段名) on 约束;
+
+-- 删除外键约束
+alter table 表名 drop foreign key 约束;
+```
 
 ### 删除表
 
-`drop table 表名;`
+```mysql
+drop table [if exists] 表名;
+```
 
 ### 创建索引
 
@@ -195,7 +283,19 @@ create table [库名] 表名(
 
 ### 添加数据
 
-`insert into 表名 values (字段值1 [, ...]);`
+```mysql
+insert into 表名(字段名1, 字段名2, ...) values(值1, 值2,...);
+insert into 表名 values(值1, 值2, ..., 值n);
+
+insert into 表名(字段名1, 字段名2, ...) values
+	(值1, 值2,...), 
+	(值1, 值2,...),
+	...;
+insert into 表名 values
+	(值1, 值2, ..., 值n),
+	(值1, 值2, ..., 值n),
+	...;
+```
 
 ### 更新数据
 
@@ -205,6 +305,91 @@ create table [库名] 表名(
 
 `delete from 表名 [where ...];`
 
+### 查询语句
+
+```mysql
+select 
+	字段列表 
+from 
+	表名列表 
+where 
+	条件列表 
+group by 
+	分组字段列表 
+having 
+	分组后条件列表 
+order by 
+	排序字段列表 
+limit 
+	分页参数
+
+-- 查询多个字段
+select 字段1，字段2，字段3 from 表名;
+
+-- 查询所有字段
+select * from 表名;
+
+-- 为查询字段设置别名，as 关键词可以省略
+select 字段1 [as 别名1], 字段2 [as 别名2] from 表名;
+
+-- 去除重复记录
+select distinct 字段列表 from 表名;
+```
+
+#### 条件查询
+
+```mysql
+select 字段列表 from 表名 where 条件列表;
+```
+
+|       比较运算       |               功能               |
+| :--------------: | :----------------------------: |
+|        >         |               大于               |
+|        >=        |              大于等于              |
+|        <         |               小于               |
+|        <=        |              小于等于              |
+|        =         |               等于               |
+|     <> 或 !=      |              不等于               |
+| between...and... |         在某个范围之内(包含边界)          |
+|     in(...)      |       在 in 之后的列表中的值，多选一        |
+|     like 占位符     | 模糊匹配( `_` 匹配单个字符, `%` 匹配任意个字符) |
+|     is null      |             是 null             |
+|     and 或 &&     |               并且               |
+|    or 或 \|\|     |               或者               |
+|     not 或 !      |               非                |
+
+#### 分组查询
+
+*聚合函数*: 将一列数据作为一个整体，进行纵向计算。
+
+|  函数   |  功能  |
+| :---: | :--: |
+| count | 统计数量 |
+|  max  | 最大值  |
+|  min  | 最小值  |
+|  avg  | 平均值  |
+|  sum  |  求和  |
+
+**注**: null 不参与 聚合函数的统计。
+
+```mysql
+select 字段列表 from 表名 [where 条件列表] group by 字段分组名 [having 分组后过滤条件];
+```
+
+#### 排序查询
+
+```mysql
+select 字段列表 from 表名 [where 条件列表] [group by 字段分组名 [having 分组后过滤条件]] order by 排序字段 排序方式;
+
+-- 排序方式: asc 默认 升序, desc 降序
+```
+
+#### 分页查询
+
+```mysql
+select 字段 from 表名 [where 条件] [group by 分组字段 having 过滤条件] [order by 排序字段] limit 起始索引, 查询记录数;
+-- 起始索引从 0 开始
+```
 ### 查询多表
 
 - 等值连接
