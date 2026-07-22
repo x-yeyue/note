@@ -73,3 +73,29 @@ public Result delete(Integer id){
 	return Result.success();
 }
 ```
+
+### @RequestBody (接收 json 数据)
+
+> 接收 json 格式的请求参数: `POST /depts {"name": "教研室"}`
+
+json 格式的参数，通常会使用一个实体对象进行接收。
+
+**规则**: json 数据的 *键名* 与方法形参 *对象的属性名* 相同，并需要使用 `@RequestBody` 注解标识。
+
+```java
+@PostMapping("/depts")
+public Result add(@RequestBody Dept dept){
+	System.out.println("新增部门: " + dept);
+	return Result.success();
+}
+```
+
+```java
+public class Dept {
+    private Integer id;
+    private String name;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+}
+```
+
