@@ -25,3 +25,51 @@
 在 `SpringbootWebQuickstartApplication` 中运行后，实现该效果。如图:
 
 ![](img/basic_requeir_achieve.png)
+
+## 获取请求参数
+
+`/dept?id=14`
+
+### HttpServletRequest
+
+```java
+/**
+ * 第一种方式 HttpServletRequest
+ */
+@DeleteMapping("/depts")
+public Result delete(HttpServletRequest request){
+	String idStr = request.getParameter("id");
+	int id = Integer.parseInt(idStr);
+	System.out.println("根据 ID 删除部门: " + id);
+	return Result.success();
+}
+```
+
+### @RequestParam
+
+```java
+/**
+ * 第二种方式 @RequestParam
+ * 注: 一旦设置了 @RequestParam 注解，则指定参数必须传递，否则会报错。(默认 required = true)
+ */
+@DeleteMapping("/depts")
+public Result delete(@RequestParam(value = "id", required = false) Integer deptId){
+	System.out.println("根据 ID 删除部门: " + deptId);
+	return Result.success();
+}
+```
+
+### 省略 @RequestParam (推荐)
+
+```java
+/**
+ * 第三种方式，省略 @RequestParam
+ * 当请求参数名与形参变量名相同，直接定义方法形参即可
+ * /depts?id=15
+ */
+@DeleteMapping("/depts")
+public Result delete(Integer id){
+	System.out.println("根据 ID 删除部门: " + id);
+	return Result.success();
+}
+```

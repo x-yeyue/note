@@ -14,8 +14,8 @@
         <scope>test</scope>  
     </dependency>
     <dependency>
-        <groupId>org.projectlombok</groupId>  
-        <artifactId>lombok</artifactId>  
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
         <version>1.18.30</version>  
     </dependency>
 </dependencies>
