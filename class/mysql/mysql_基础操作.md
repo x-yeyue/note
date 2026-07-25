@@ -390,10 +390,119 @@ select 字段列表 from 表名 [where 条件列表] [group by 字段分组名 [
 select 字段 from 表名 [where 条件] [group by 分组字段 having 过滤条件] [order by 排序字段] limit 起始索引, 查询记录数;
 -- 起始索引从 0 开始
 ```
-### 查询多表
+### 多表查询
 
 - 等值连接
   `from 表1 join 表2 on 表1.字段 = 表2.字段`
 - 自然连接
   `from 表1 natural join 表2`
 
+#### 内连接
+
+内连接查询的是两张表交集部分的内容。
+
+```mysql
+-- 隐式内连接
+select 字段列表 from 表1, 表2 where 连接条件 ...;
+
+-- 显示内连接
+select 字段列表 from 表1 [inner] join 表2 on 连接条件 ...;
+```
+
+样例:
+
+```mysql
+-- A. 查询所有员工的ID, 姓名 , 及所属的部门名称 (隐式、显式内连接实现)
+-- 隐式
+select emp.id, emp.name, dept.name from emp, dept where dept.id = emp.dept_id;
+-- 显示
+select emp.id, emp.name, dept.name from emp join dept on dept.id = emp.dept_id;
+
+
+-- B. 查询 性别为男, 且工资 高于8000 的员工的ID, 姓名, 及所属的部门名称 (隐式、显式内连接实现)
+-- 隐式
+select emp.id, emp.name, dept.name from emp, dept where emp.dept_id = dept.id && emp.gender = 1 && emp.salary > 8000;
+-- 显示
+select emp.id, emp.name, dept.name from emp join dept on emp.dept_id = dept.id where emp.gender = 1 && emp.salary > 8000;
+```
+
+#### 外连接
+
+外连接分为 左外连接 和 右外连接。
+
+左外连接包含所有左表数据和两表相交的内容。
+
+右外连接同理。
+
+```mysql
+-- 左外连接
+select 字段列表 from 表1 left [outer] join 表2 on 连接条件 ...;
+
+-- 右外连接
+select 字段列 from 表2 right [outer] join 表2 on 连接条件 ...;
+```
+
+样例:
+
+```mysql
+-- A. 查询员工表 所有 员工的姓名, 和对应的部门名称 (左外连接)
+select emp.name, dept.name from emp left join dept on emp.dept_id = dept.id;
+
+-- B. 查询部门表 所有 部门的名称, 和对应的员工名称 (右外连接)
+select dept.name, emp.name from emp right join dept on emp.dept_id = dept.id;
+
+-- C. 查询工资 高于8000 的 所有员工的姓名, 和对应的部门名称 (左外连接)
+select emp.name, dept.name from emp left join dept on emp.dept_id = dept.id where emp.salary > 8000;
+```
+
+#### 子查询
+
+SQL 语句中嵌套 select 语句，称为嵌套查询，又称为子查询。
+
+```mysql
+select * from 表1 where column1 = (select column1 from 表2 ...);
+```
+
+子查询外部的语句可以是 `insert`，`update`，`delete`，`select` 的任何一个。
+
+分类:
+- 标量子查询: 返回结果为单个值。
+- 列子查询: 返回结果为一列。
+- 行子查询: 返回结果为一行。
+- 表子查询: 返回的结果为多行多列。
+
+样例:
+
+```mysql
+-- 标量子查询
+-- A. 查询 最早入职 的员工信息
+select * from emp where emp.entry_date = (
+	select min(entry_date) from emp
+);
+
+-- B. 查询在 "阮小五" 入职之后入职的员工信息
+select * from emp where entry_date > (
+	select entry_date from emp where name = "阮小五"
+);
+
+
+-- 列子查询
+-- A. 查询 "教研部" 和 "咨询部" 的所有员工信息
+select * from emp where dept_id in (
+	select id from dept where name in ("教研部", "咨询部")
+);
+
+
+-- 行子查询
+-- A. 查询与 "李忠" 的薪资 及 职位都相同的员工信息 ;
+select * from emp where (salary, dept_id) = (
+	select salary, dept_id from emp where name = '李忠'
+);
+
+
+-- 表子查询
+-- A. 获取每个部门中薪资最高的员工信息
+select * from emp join (
+	select dept_id, max(salary) max_salary from emp group by dept_id
+) temp on emp.dept_id = temp.dept_id && emp.salary = temp.max_salary;
+```
