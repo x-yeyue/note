@@ -99,3 +99,124 @@ public class Dept {
 }
 ```
 
+### @PathVariable(接收 路径参数)
+
+> 接收路径参数: `GET /depts/1`
+
+路径参数: 通过 URL 直接传递参数，使用 `{...}` 来标识该路径参数，需要使用 `@PathVariable` 获取路径参数。
+
+```java
+@GetMapping("/depts/{id}")
+public Result getInfo(@PathVariable("id") Integer deptId){
+	System.out.println("根据  ID 查询部门: " + deptId);
+	return Result.success();
+}
+```
+
+当路径参数和形参一致时，简略写法:
+
+```java
+@GetMapping("/depts/{id}")
+public Result getInfo(@PathVariable Integer id){
+	System.out.println("根据  ID 查询部门: " + id);
+	return Result.success();
+}
+```
+
+## 请求路径简化
+
+当请求路径中有公共前缀时，可以在类前通过 `@RequestMapping` 注解标注公共部分。
+
+原:
+
+```java
+@RestController
+public class DeptController {
+
+    @Autowired
+    private DeptService deptService;
+
+    @GetMapping("/depts")
+    public Result list(){
+        System.out.println("查询全部的部门数据");
+        List<Dept> deptList = deptService.findAll();
+        return Result.success(deptList);
+    }
+
+    @DeleteMapping("/depts")
+    public Result delete(Integer id){
+        System.out.println("根据 ID 删除部门: " + id);
+        deptService.deleteById(id);
+        return Result.success();
+    }
+
+    @PostMapping("/depts")
+    public Result add(@RequestBody Dept dept){
+        System.out.println("新增部门: " + dept);
+        deptService.add(dept);
+        return Result.success();
+    }
+
+    @GetMapping("/depts/{id}")
+    public Result getInfo(@PathVariable Integer id){
+        System.out.println("根据  ID 查询部门: " + id);
+        Dept dept = deptService.getById(id);
+        return Result.success(dept);
+    }
+
+    @PutMapping("/depts")
+    public Result update(@RequestBody Dept dept){
+        System.out.println("根据 id 更新部门信息: " + dept);
+        deptService.update(dept);
+        return Result.success();
+    }
+}
+```
+
+简化:
+
+```java
+@RequestMapping("/depts")
+@RestController
+public class DeptController {
+
+    @Autowired
+    private DeptService deptService;
+
+    @GetMapping
+    public Result list(){
+        System.out.println("查询全部的部门数据");
+        List<Dept> deptList = deptService.findAll();
+        return Result.success(deptList);
+    }
+
+    @DeleteMapping
+    public Result delete(Integer id){
+        System.out.println("根据 ID 删除部门: " + id);
+        deptService.deleteById(id);
+        return Result.success();
+    }
+
+    @PostMapping
+    public Result add(@RequestBody Dept dept){
+        System.out.println("新增部门: " + dept);
+        deptService.add(dept);
+        return Result.success();
+    }
+
+    @GetMapping("/{id}")
+    public Result getInfo(@PathVariable Integer id){
+        System.out.println("根据  ID 查询部门: " + id);
+        Dept dept = deptService.getById(id);
+        return Result.success(dept);
+    }
+
+    @PutMapping
+    public Result update(@RequestBody Dept dept){
+        System.out.println("根据 id 更新部门信息: " + dept);
+        deptService.update(dept);
+        return Result.success();
+    }
+}
+```
+
