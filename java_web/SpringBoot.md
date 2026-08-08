@@ -59,6 +59,17 @@ public Result delete(@RequestParam(value = "id", required = false) Integer deptI
 }
 ```
 
+#### 设置参数默认值
+
+```java
+@GetMapping("/emps")
+public Result page(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer pageSize){
+        log.info("分页查询: {}, {}", page, pageSize);
+        PageResult<Emp> pageResult = empService.page(page, pageSize);
+        return Result.success(pageResult);
+    }
+```
+
 ### 省略 @RequestParam (推荐)
 
 ```java
@@ -219,4 +230,39 @@ public class DeptController {
     }
 }
 ```
+
+# 分页查询
+
+## 原始方案
+
+```java
+// =============== Mapper 层 ===============
+
+/**
+ * 查询总记录数
+ */
+@Select("Select count(*) from emp ...")
+public Long count();
+
+/**
+ * 分页查询
+ */
+@Select("Select emp.*, dept.name deptName from emp ... limit #{start}, #{pageSize} ")
+public List<Emp> list(Integer start, Integer pageSize);
+
+// =============== Service 层 ===============
+
+public PageResult<Emp> page(Integer page, Integer pageSize) {
+	log.info("获取 PageResult.");
+	Integer start = (page - 1) * pageSize;
+	Long total = empMapper.count(); 
+	log.info("用户信息条数: {}", total);
+	List<Emp> empList = empMapper.list(start, pageSize);
+	return new PageResult<Emp> (total, empList);
+}
+```
+
+## PageHelper 插件
+
+PageHelper 是第三方的在 Mybatis 框架中用来实现分页的插件，用来 *简化分页操作*，*提高开发效率*。
 
