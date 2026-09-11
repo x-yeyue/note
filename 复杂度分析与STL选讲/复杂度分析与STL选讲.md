@@ -195,13 +195,13 @@ $O(1),\; O(logn),\; O(\sqrt{n}),\; O(n),\; O(nlogn),\; O(n^{2}), \cdots, O(n^{k}
 c++中使用 $cin$ 和 $cout$ 输入输出的效率是很慢的。
 
 [例子](https://www.matiji.net/exam/brushquestion/3/4581/7948FA869678083D1D01ACAA1ABCFB0B?from=brushNoi)
-![题目](./题目.png "题目.png")
+![题目](img/题目.png "题目.png")
 
-![数据范围](./题目_数据范围.png "数据范围.png")
+![数据范围](img/题目_数据范围.png "数据范围.png")
 
-![submit_TLE](./submit_TLE.png "submit_TLE.png")
+![submit_TLE](img/submit_TLE.png "submit_TLE.png")
 
-![submit_AC](./submit_AC.png "submit_AC.png")
+![submit_AC](img/submit_AC.png "submit_AC.png")
 
 ```c++
 // 关闭 cin/cout 与 C 语言 stdio（如 scanf/printf）的同步机制，消除冗余开销。
