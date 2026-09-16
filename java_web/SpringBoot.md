@@ -70,6 +70,7 @@ public Result page(@RequestParam(defaultValue = "1") Integer page, @RequestParam
     }
 ```
 
+
 ### 省略 @RequestParam (推荐)
 
 ```java
@@ -107,6 +108,29 @@ public class Dept {
     private String name;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+}
+```
+
+### 获取日期时间
+
+请求路径中的日期格式可能会有很多，例如: `yyyy-MM-dd`、`yyyy/MM/dd`、`yyyy年MM月dd日` 等等。
+
+通过 `@DateTimeFormat` 注解，指定 `pattern` 参数来确定日期格式，该注解会将日期按照该格式解析后传递给后面的参数。
+
+```java
+/**
+ * 请求路径: /emps?name=张&gender=1&begin=2007-09-01&end=2022-09-01&page=1&pageSize=10
+*/
+@GetMapping
+public Result page(@RequestParam(defaultValue = "1") Integer page,
+				   @RequestParam(defaultValue = "10") Integer pageSize,
+				   String name,
+				   Integer gender,
+				   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+				   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
+	log.info("分页查询: page-{}, pageSize-{}, name-{}, gender-{}, begin-{}, end-{}", page, pageSize,  name, gender, begin, end);
+	PageResult<Emp> pageResult = empService.page(page, pageSize, name, gender, begin, end);
+	return Result.success(pageResult);
 }
 ```
 
@@ -264,5 +288,122 @@ public PageResult<Emp> page(Integer page, Integer pageSize) {
 
 ## PageHelper 插件
 
-PageHelper 是第三方的在 Mybatis 框架中用来实现分页的插件，用来 *简化分页操作*，*提高开发效率*。
+![[PageHelper]]
 
+## 条件分页查询
+
+### 基本实现
+
+请求参数: `emps?name=阮&gender=1&begin=2007-09-01&end=2022-09-01&page=1&pageSize=10`
+
+controller层:
+
+```java
+public Result page(@RequestParam(defaultValue = "1") Integer page,
+                       @RequestParam(defaultValue = "10") Integer pageSize,
+                       String name,
+                       Integer gender,
+                       @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+                       @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
+        log.info("分页查询: page-{}, pageSize-{}, name-{}, gender-{}, begin-{}, end-{}", page, pageSize,  name, gender, begin, end);
+        PageResult<Emp> pageResult = empService.page(page, pageSize, name, gender, begin, end);
+        return Result.success(pageResult);
+    }
+```
+
+- `@DateTimeFormat()` 注解参考 [获取日期时间](#获取日期时间)。
+
+service 层及 mapper 层见 [多参数查询](PageHelper.md#多参数查询) 部分的图片。
+
+SQL 代码:
+
+```sql
+select emp.*, dept.name from emp left join dept on emp.dept_id = dept.id
+	where
+		emp.name like concat('%', #{name}, '%') and
+		emp.gender = #{gender} and
+		emp.entry_date
+	between #{begin} and #{end}
+	order by emp.update_time desc
+```
+
+`concat()` 函数参考 [MySQL字符串拼接](../class/mysql/mysql_基础操作.md#字符串拼接) 。
+
+如果直接使用 `emp.name like '%#{name}%'` 替换 `concat()` 函数，在编译后，会形成 `emp.name like '%?%'`，由于外部的引号，该位置的就会变成一个字符串，就会导致参数无法传递，从而报错。
+
+### 程序优化
+
+#### 请求参数接收优化
+
+如果 controller 方法的 *参数较多* ，且未来可能继续增加，这会使得方法签名变得复杂难以维护，此时可以考虑将多个请求参数 **封装为一个对象**。
+
+```java
+@Data
+public class EmpQueryParam {
+    private Integer page = 1; // 当前页码
+    private Integer pageSize = 10; // 每页记录数
+    private String name; // 员工姓名
+    private Integer gender; // 员工性别
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate begin; // 查询入职日期起始时间
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate end; // 入职日期日期结束时间
+}
+```
+
+```java
+// ================== controller ==================
+@GetMapping  
+public Result page(EmpQueryParam empQueryParam) {  
+    log.info("分页查询: {}", empQueryParam);  
+    PageResult<Emp> pageResult = empService.page(empQueryParam);  
+    return Result.success(pageResult);  
+}
+
+// ================== service ==================
+public PageResult<Emp> page(EmpQueryParam empQueryParam) {  
+    // 设置分页参数  
+    PageHelper.startPage(empQueryParam.getPage(), empQueryParam.getPageSize());  
+    // 调用 Mapper 接口方法  
+    List<Emp> empList = empMapper.list(empQueryParam);  
+    // 解析并封装结果  
+    Page<Emp> p = (Page<Emp>) empList;  
+    return new PageResult<Emp>(p.getTotal(), p.getResult());  
+}
+
+// ================== mapper ==================
+public List<Emp> list(EmpQueryParam empQueryParam);
+```
+
+**注:** mapper层使用了 [XML 映射配置(SQL)](Mybatis.md#XML%20映射配置(SQL))。
+
+```sql
+select emp.*, dept.name from emp left join dept on emp.dept_id = dept.id  
+    where        
+	    emp.name like concat('%', #{name}, '%') and        
+	    emp.gender = #{gender} and        
+	    emp.entry_date between #{begin} and #{end}    
+	order by emp.update_time desc
+```
+
+#### 动态 SQL 优化
+
+当有多个传递参数时，可能有部分传递参数为 `null` 即为传递，当 SQL 被写死，就会出现报错，通过 Mybatis 的 [动态 SQL](Mybatis.md#动态%20SQL) 进行优化，就能解决传递参数缺失造成的报错问题。
+
+```xml
+<select id = "list" resultType = "com.itheima.pojo.Emp">  
+    select emp.*, dept.name from emp left join dept on emp.dept_id = dept.id  
+        <where>  
+            <if test="name != null and name != ''">  
+                emp.name like concat('%', #{name}, '%')  
+            </if>  
+            <if test="gender != null">  
+                and emp.gender = #{gender}  
+            </if>  
+            <if test="begin != null  and end != null">  
+                and emp.entry_date between #{begin} and #{end}  
+            </if>  
+        </where>  
+        order by emp.update_time desc  
+</select>
+```
