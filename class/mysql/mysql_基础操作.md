@@ -57,7 +57,7 @@
 
 - **\G** ：讲查询结果按列显示。
 
-![SHOW_ENGINES_\G](img/mysql/SHOW_ENGINES_G.png "SHOW_ENGINES_\G.png")
+![SHOW_ENGINES_G.png](img/SHOW_ENGINES_G.png)
 
 常用参数：
 
@@ -505,4 +505,14 @@ select * from emp where (salary, dept_id) = (
 select * from emp join (
 	select dept_id, max(salary) max_salary from emp group by dept_id
 ) temp on emp.dept_id = temp.dept_id && emp.salary = temp.max_salary;
+```
+
+## 字符串拼接
+
+利用 `concat()` 函数实现字符串拼接。
+
+```sql
+select concat('%', '王', '%');
+
+>>> %王%
 ```
