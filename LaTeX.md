@@ -52,7 +52,8 @@
 |  文本  |           `\text{}`           |                      `\text{文本内容}` -> $\text{文本内容}$                      |
 |  异或  |           `\oplus`            |                       `a \oplus b` -> $a \oplus b$                       |
 |  向量  | `\vec{}`\|`\overrightarrow{}` | `\vec{a}` -> $\vec{a}$ \| `\overrightarrow{ab}` -> $\overrightarrow{ab}$ |
-|      |                               |                                                                          |
+|  正负  |             `\pm`             |                              `\pm` -> $\pm$                              |
+|  负正  |             `\mp`             |                              `\mp` -> $\mp$                              |
 
 ### 多行LaTeX公式对齐
 
