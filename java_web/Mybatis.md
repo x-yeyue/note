@@ -226,6 +226,30 @@ mybatis.mapper-locations=classpath:mapper/*.xml
 
 **注:** `<where>` 标签仅会去除多余的 `and` 或 `or` 并不能添加缺失的 `and` 或 `or`，且仅对前端起效。
 
+## set
+
+`<set>` 标签会自动去除每项 `<if>` 条件中末尾多余的 ","。
+
+```xml
+<update id="updateById">  
+    update brand  
+    <set>  
+        <if test="companyName != null and companyName != ''">  
+            company_name = #{companyName},  
+        </if>  
+        <if test="ordered != null">  
+            ordered = #{ordered},  
+        </if>  
+        <if test="description != null and description != ''">  
+            description = #{description},  
+        </if>  
+        <if test="status != null">  
+            status = #{status},  
+        </if>  
+    </set>  
+</update>
+```
+
 ## choose 与 when
 
 `<choose>` 标签中的所有 `<when>` 标签仅会执行一个满足条件的 `<when>`。
