@@ -225,3 +225,24 @@ mybatis.mapper-locations=classpath:mapper/*.xml
 ```
 
 **注:** `<where>` 标签仅会去除多余的 `and` 或 `or` 并不能添加缺失的 `and` 或 `or`，且仅对前端起效。
+
+## choose 与 when
+
+`<choose>` 标签中的所有 `<when>` 标签仅会执行一个满足条件的 `<when>`。
+
+```xml
+<select id = "selectByCondition2" resultMap = "brandMap">
+	select * from brand
+	<where>
+		<choose>
+			<when test="companyName != null and comanyName != ''">
+				company_name like concat('%',#{companyName},'%')
+			</when>
+			<when test="brandName != null and brandName != ''">
+				brand_name like concat('%',#{brandName},'%');
+			</when>
+		<choose>
+	</where>
+</select>
+```
+
