@@ -270,3 +270,32 @@ mybatis.mapper-locations=classpath:mapper/*.xml
 </select>
 ```
 
+## foreach
+
+当要实现批量添加需求:
+
+```mysql
+insert into emp_expr(...) values (?, ?, ?), (?, ?, ?), (?, ?, ?);
+```
+
+就是可以使用 `<foreach>` 标签实现。
+
+属性:
+- `collection`: 集合名称。
+- `item`: 集合遍历出来的元素/项。
+- `separator`: 每一次遍历使用的分隔符。
+- `open`: 遍历开始前拼接的片段。
+- `close`: 遍历结束后拼接的片段。
+
+```java
+public void insertBatch(List<EmpExpr> exprList);
+```
+
+```xml
+<insert id="insertBatch">  
+    insert into emp_expr(emp_id, begin, end, company, job) VALUES  
+    <foreach collection="exprList" item="expr" separator=",">  
+        (#{expr.empId}, #{expr.begin}, #{expr.end}, #{expr.company}, #{expr.job})  
+    </foreach>  
+</insert>
+```
