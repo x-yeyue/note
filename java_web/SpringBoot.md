@@ -158,6 +158,29 @@ public Result getInfo(@PathVariable Integer id){
 }
 ```
 
+## 接收数组
+
+`/emps?ids=1,2,3`
+
+1. 通过数组接收
+   ```java
+   @DeleteMapping  
+	public Result delete(Integer[] ids){  
+	    log.info("根据ID删除员工: {}", ids);  
+	    return Result.success();  
+	}
+   ```
+2. 通过集合接收
+   ```java
+   // 将接收到的参数封装到集合等复杂类型中必须写 @RequestParam 注解
+   @DeleteMapping
+    public Result delete(@RequestParam List<Integer> ids){
+        log.info("根据ID删除员工: {}", ids);
+        return Result.success();
+
+    }
+   ```
+
 ## 请求路径简化
 
 当请求路径中有公共前缀时，可以在类前通过 `@RequestMapping` 注解标注公共部分。
@@ -407,6 +430,37 @@ select emp.*, dept.name from emp left join dept on emp.dept_id = dept.id
         order by emp.update_time desc  
 </select>
 ```
+
+# 启用数据库自动产生的主键
+
+当有些表的主键设置了*自增*属性，那么在插入新的记录的时候就需要尽量避开为这个字段赋值。
+
+那么如果在插入记录后，就要利用这个新增 记录的主键呢？
+
+选择用单独的查询语句来查询吗？
+
+可以利用 Mybatis 的设置快速获取。
+
+## 注解映射
+
+   ```java
+   @Options(useGeneratedKeys = true, keyProperty = "id")
+   @Insert("insert into ......")
+   void insert(Emp emp);
+   ```
+
+## XML 映射
+
+   ```java
+   void insert(Emp emp);
+   
+   
+   ------------ xml ------------
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">  
+	    insert into ......
+	</insert>
+   ```
+
 # 事务管理
 
 ## 通过注解操作
