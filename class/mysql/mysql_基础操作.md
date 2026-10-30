@@ -516,3 +516,51 @@ select concat('%', '王', '%');
 
 >>> %王%
 ```
+
+# 事务管理
+
+## 引入
+
+需要向数据库新增一组数据，数据内容分跨两张表。
+
+```mysql
+insert into emp(id, name, password) values (39, 'Tom', '123456');
+
+insert into emp_expr(emp_id, begin, end, company, job) values(39, '2020-1-1', '2021-1-1', '华为', '开发');
+```
+
+由于网络等原因，数据库仅执行了第一条命令，导致了数据的不完整。
+
+## 概念
+
+事务 是一组操作的集合，它是一个不可分割的工作单位。
+
+事务 会把所有的操作作为一个整体一起向系统提交或撤销操作请求，即这些操作 **要么同时成功，要么同时失败**。
+
+> [!tips] 注意
+> 默认 MySQL 的事务是自动提交的，也就是说，当执行一条 DML 语句，MySQL 会立即隐式的提交事务。
+
+## 操作
+
+事务操作: 开启事务、提交事务/回滚事务。
+
+```mysql
+-- 开启事务
+start transaction; / begin;
+
+
+insert into emp(id, name, password) values (39, 'Tom', '123456');
+
+insert into emp_expr(emp_id, begin, end, company, job) values(39, '2020-1-1', '2021-1-1', '华为', '开发');
+
+
+-- 提交事务(全部成功) / 回滚事务(有失败)
+commit; / rollback;
+```
+
+## 事务的四大特性(ACID)
+
+- **原子性** Atomicity: 事务是不可分割的最小单元，要么全部成功，要么全部失败。
+- **一致性** Consistency: 事务完成时，必须使所有的数据都保持一致。
+- **隔离性** Isolation: 数据库提供的隔离机制，保证事务在不受外部并发操作影响的独立环境运行。
+- **持久性** Durability: 事务一旦提交或回滚，它对数据库中的数据的改变就是永久的。

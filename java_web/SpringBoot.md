@@ -407,3 +407,188 @@ select emp.*, dept.name from emp left join dept on emp.dept_id = dept.id
         order by emp.update_time desc  
 </select>
 ```
+# 事务管理
+
+## 通过注解操作
+
+概念见 [事务管理](../class/mysql/mysql_基础操作.md#事务管理)。
+
+- 注解: `@Transactional`
+- 作用: 将当前方法交给 spring 进行事务管理，方法执行前，开启事务；成功执行完毕、提交事务；出现异常，回滚事务。
+- 位置: 业务层(service) 的方法上、类上、接口上。
+
+```java
+@Transactional  
+@Override  
+public void save(Emp emp) {  
+    // 保存员工基本信息  
+    emp.setCreateTime(LocalDateTime.now());  
+    emp.setUpdateTime(LocalDateTime.now());  
+    empMapper.insert(emp);  
+  
+    // 保存员工工作经历信息  
+    List<EmpExpr> exprList = emp.getExprList();  
+    if(!exprList.isEmpty()){  
+        // 遍历集合，为每项 empExpr 的 empId 赋值  
+        exprList.forEach(empExpr -> {  
+            empExpr.setEmpId(emp.getId());  
+        });  
+  
+        empExprMapper.insertBatch(exprList);  
+    }  
+}
+```
+
+> [!tips]
+> 推荐将 `@Transactional` 注解放在有多个数据库操作的方法上。
+
+## 设置事务管理的日志信息
+
+```yml
+# 配置事务管理日志级别  
+logging:  
+  level:  
+    org.springframework.jdbc.support.JdbcTransactionManager: debug
+```
+
+
+## 事务进阶
+
+### 控制回滚事务类型 rollbackFor
+
+`@Transactional` 的 `rollbackFor` 属性用于控制出现何种异常类型，回滚事务。
+
+```java
+@Transactional(rollbackFor = {Exception.class}) // 所有异常都回滚
+@Override  
+public void save(Emp emp) {  
+    // 保存员工基本信息  
+    emp.setCreateTime(LocalDateTime.now());  
+    emp.setUpdateTime(LocalDateTime.now());  
+    empMapper.insert(emp);  
+  
+    // 保存员工工作经历信息  
+    List<EmpExpr> exprList = emp.getExprList();  
+    if(!exprList.isEmpty()){  
+        // 遍历集合，为每项 empExpr 的 empId 赋值  
+        exprList.forEach(empExpr -> {  
+            empExpr.setEmpId(emp.getId());  
+        });  
+  
+        empExprMapper.insertBatch(exprList);  
+    }  
+}
+```
+
+> [!tips]
+> 默认情况下仅会在出现 运行时异常 `RuntimeException` 事务才会回滚。
+
+### 事务的传播行为 propagation
+
+`propagation` 属性用于设置事务传播行为: 当一个事务方法被另一个事务方法调用时，这个事务方法应该如何进行事务控制。
+
+```java
+@Transacational
+public void a(){
+	// ...
+	userService.b();
+	// ...
+}
+
+------
+
+@Transacational(propagation = Propagation.REQUIRED)
+public void b(){
+	// ...
+}
+```
+
+|      属性值      |                含义                 |
+| :-----------: | :-------------------------------: |
+|   REQUIRED    |      \[默认值]需要事务，有则加入，无则创建新事物      |
+| REQUIRES_NEW  |        需要新事务，无论有无，总是创建新事务         |
+|   SUPPORTS    |       支持事务，有则加入，无则在无事务状态运行        |
+| NOT_SUPPORTED | 不支持事务，在无事务状态运行，如果当前存在已有事务，则挂起当前事务 |
+|   MANDATORY   |            必须有事务，否则抛异常            |
+|     NEVER     |            必须没事务，否则抛异常            |
+
+#### 样例
+
+需求: 在新增员工信息时，无论是成功还是失败，都要记录操作日志。
+
+```java
+// ============== EmpServiceImpl ==============
+@Transactional(rollbackFor = {Exception.class}) // 事务管理(设置所有异常都回滚)  
+@Override  
+public void save(Emp emp) throws Exception {  
+    try {  
+        // 保存员工基本信息  
+        emp.setCreateTime(LocalDateTime.now());  
+        emp.setUpdateTime(LocalDateTime.now());  
+        empMapper.insert(emp);  
+  
+        Integer i = 1/0;  
+        
+        List<EmpExpr> exprList = emp.getExprList();  
+        if(!exprList.isEmpty()){  
+            // 遍历集合，为每项 empExpr 的 empId 赋值  
+            exprList.forEach(empExpr -> {  
+                empExpr.setEmpId(emp.getId());  
+            });  
+  
+            empExprMapper.insertBatch(exprList);  
+        }  
+    } finally {  // 记录操作日志
+        EmpLog empLog = new EmpLog(null, LocalDateTime.now(), "新增员工: " + emp);  
+        empLogService.insertLog(empLog);
+    }  
+}
+
+// ============== EmpLogServiceImpl ==============
+@Override  
+public void insertLog(EmpLog empLog) {  
+    empLogMapper.insert(empLog);  
+}
+```
+
+当调用后，由于 `i / 0` 发生了错误，即使将记录操作日志的行为放到了 `finally` 块中，其代码的确执行了，但由于该方法发生了错误，最终会被 *事务回滚*，导致操作日志没有成功写入数据库。 
+
+解决方案: 在 `EmpLogServiceImpl` 的 `insertLog` 方法添加事务管理，同时设置 `propagation` 属性为 `REQUIRES_NEW`，在一个新创建的事务中运行。
+
+```java
+// ============== EmpServiceImpl ==============
+@Transactional(rollbackFor = {Exception.class}) // 事务管理(设置所有异常都回滚)  
+@Override  
+public void save(Emp emp) throws Exception {  
+    try {  
+        // 保存员工基本信息  
+        emp.setCreateTime(LocalDateTime.now());  
+        emp.setUpdateTime(LocalDateTime.now());  
+        empMapper.insert(emp);  
+  
+        Integer i = 1/0;  
+        
+        List<EmpExpr> exprList = emp.getExprList();  
+        if(!exprList.isEmpty()){  
+            // 遍历集合，为每项 empExpr 的 empId 赋值  
+            exprList.forEach(empExpr -> {  
+                empExpr.setEmpId(emp.getId());  
+            });  
+  
+            empExprMapper.insertBatch(exprList);  
+        }  
+    } finally {  // 记录操作日志
+        EmpLog empLog = new EmpLog(null, LocalDateTime.now(), "新增员工: " + emp);  
+        empLogService.insertLog(empLog);
+    }  
+}
+
+// ============== EmpLogServiceImpl ==============
+@Transactional(propagation = Propagation.REQUIRES_NEW) // 在新建的事务中运行  
+@Override  
+public void insertLog(EmpLog empLog) {  
+    empLogMapper.insert(empLog);  
+}
+```
+
+
