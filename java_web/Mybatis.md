@@ -187,6 +187,55 @@ mybatis.mapper-locations=classpath:mapper/*.xml
 
 ![Mybatis_XML07](img/Mybatis_XML07.png)
 
+## resultMap 映射
+
+```java
+public class Emp {
+    private Integer id; //ID,主键
+    private String username; //用户名
+    private String password; //密码
+    private String name; //姓名
+    private Integer gender; //性别, 1:男, 2:女
+    private String phone; //手机号
+    private Integer job; //职位, 1:班主任,2:讲师,3:学工主管,4:教研主管,5:咨询师
+    private Integer salary; //薪资
+    private String image; //头像
+    private LocalDate entryDate; //入职日期
+    private Integer deptId; //关联的部门ID
+    private LocalDateTime createTime; //创建时间
+    private LocalDateTime updateTime; //修改时间
+    // 部门名称
+    private String deptName;
+    // 工作经历信息
+    private List<EmpExpr> exprList;
+}
+```
+
+针对这种较为复杂的类，里面包含了集合，集合中又包含了其他类，在简单的如下:
+
+```java
+<mapper namespace = "com.itheima.mapper.EmpMapper">
+    <select id="getById" resultType="com.itheima.pojo.Emp">
+        ...
+    </select>
+</mapper>
+```
+
+要在 `<mapper>` 标签中添加 `<resultMap>` 标签。
+
+![Mybatis_XML08](img/Mybatis_XML08.png)
+
+并将 `resultType` 属性改为 `resultMap`。
+
+```java
+<mapper namespace = "com.itheima.mapper.EmpMapper">
+	// resultMap 属性添对应的 <resultMap> 标签的 id 值
+    <select id="getById" resultMap="empResultMap">
+        ...
+    </select>
+</mapper>
+```
+
 # 动态 SQL
 
 随着用户的输入或外部条件的变化而变化的 SQL 语句，我们称为 **动态SQL**。
