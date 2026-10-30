@@ -645,4 +645,157 @@ public void insertLog(EmpLog empLog) {
 }
 ```
 
+# 文件上传
+
+## 基本实现
+
+前端:
+
+```html
+<!-- 
+要求:
+1. 表单提交方式 method 必须为 post (提交文件可能很大，get 允许空间较小)
+2. form 标签需要添加 enctype 属性，并设置 属性为 "multipart/form-data"
+   当不设置 enctype，上传到服务器的为文件名，设置后才为文件本体。
+3. 必须存在一个 type 为 file 的 input 标签。
+-->
+<form action="/upload" method="post" enctype="multipart/form-data">  
+    姓名: <input type="text" name="name"><br>  
+    年龄: <input type="text" name="age"><br>  
+    头像: <input type="file" name="file"><br>  
+    <input type="submit" value="提交">  
+</form>
+```
+
+后端:
+
+```java
+@PostMapping("/upload")  
+// 参数需要和前端的 input 标签的 name 属性值一致，否则需要使用 @RequestParam 注解指定
+public Result upload(String name, Integer age, MultipartFile file) {  
+    log.info("接收参数: {}, {}, {}", name, age, file);  
+    return Result.success();  
+}
+```
+
+## 本地存储
+
+```java
+@PostMapping("/upload")  
+public Result upload(String name, Integer age, MultipartFile file) throws IOException {  
+    log.info("接收参数: {}, {}, {}", name, age, file);  
+    // 获取原始文件名  
+    String originalFilename = file.getOriginalFilename();  
+  
+    // 新文件名  
+    String extension = originalFilename.substring(originalFilename.lastIndexOf('.'));  
+    String newFileName = UUID.randomUUID().toString() + "." + extension;  
+  
+    //保存文件  
+    file.transferTo(new File("D:/File/AI_web/web-ai-project02/tlias-web-management/src/main/resources/imgs/" + newFileName));  
+  
+    return Result.success();  
+}
+```
+
+### 上传文件大小限制设置
+
+```yml
+# application.yml
+
+spring:  
+  application:  
+    name: tlias-web-management  
+  datasource:  
+    url: jdbc:mysql://localhost:3306/tlias  
+    driver-class-name: com.mysql.cj.jdbc.Driver  
+    username: root  
+    password: "123456"  
+  servlet:  
+    multipart:  
+      # 最大单个文件大小  
+      max-file-size: 10MB  
+      # 最大请求大小  
+      max-request-size: 100MB
+```
+
+## 阿里云OSS
+
+```java
+@Component  
+public class AliyunOSSOperator {  
+    // 方式一: @Value属性一个属性一个属性的注入  
+    // @Value("${aliyun.oss.endpoint}")    
+    // private String endpoint;    
+    //    
+    // @Value("${aliyun.oss.bucketName}")    
+    // private String bucketName;    
+    //    
+    // @Value("${aliyun.oss.region}")    
+    // private String region;  
+    
+    // 方式二: 通过类封装    
+    @Autowired  
+    AliyunOssProperties aliyunOssProperties;  
+  
+  
+    public String upload(byte[] content, String originalFilename) throws Exception {  
+        String endpoint = aliyunOssProperties.getEndpoint();  
+        String region = aliyunOssProperties.getRegion();  
+        String bucketName = aliyunOssProperties.getBucketName();  
+  
+        // 从环境变量中获取访问凭证。运行本代码示例之前，请确保已设置环境变量OSS_ACCESS_KEY_ID和OSS_ACCESS_KEY_SECRET。  
+        EnvironmentVariableCredentialsProvider credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();  
+  
+        // 填写Object完整路径，例如202406/1.png。Object完整路径中不能包含Bucket名称。  
+        //获取当前系统日期的字符串,格式为 yyyy/MM        
+        String dir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM"));  
+        //生成一个新的不重复的文件名  
+        String newFileName = UUID.randomUUID() + originalFilename.substring(originalFilename.lastIndexOf("."));  
+        String objectName = dir + "/" + newFileName;  
+  
+        // 创建OSSClient实例。  
+        ClientBuilderConfiguration clientBuilderConfiguration = new ClientBuilderConfiguration();  
+        clientBuilderConfiguration.setSignatureVersion(SignVersion.V4);  
+        OSS ossClient = OSSClientBuilder.create()  
+                .endpoint(endpoint)  
+                .credentialsProvider(credentialsProvider)  
+                .clientConfiguration(clientBuilderConfiguration)  
+                .region(region)  
+                .build();  
+  
+        try {  
+            ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(content));  
+        } finally {  
+            ossClient.shutdown();  
+        }  
+  
+        return endpoint.split("//")[0] + "//" + bucketName + "." + endpoint.split("//")[1] + "/" + objectName;  
+    }  
+  
+}
+```
+
+### 利用 @ConfigurationProperties 快速注入配置
+
+```java
+@Data  
+@Component  
+@ConfigurationProperties(prefix = "aliyun.oss")  
+public class AliyunOssProperties {  
+    private String endpoint;  
+    private String bucketName;  
+    private String region;  
+}
+```
+
+```yml
+# application.yml
+# 阿里云oss 配置  
+aliyun:  
+  oss:  
+    endpoint: "https://oss-cn-beijing.aliyuncs.com"  
+    bucketName: "java-ai-x-yeyue"  
+    region: "cn-beijing"
+```
 
