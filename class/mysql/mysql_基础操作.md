@@ -548,6 +548,27 @@ from emp group by job order by num;
 | 咨询师  |  7  |
 |  讲师  | 14  |
 
+## 条件判断 if
+
+相似于 流程控制函数 case，但不同于 case 的是，if 适用于仅 两种情况，具体参考示例代码。
+
+语法: `if(条件表达式, true_value, false_value)`
+
+样例:
+
+```mysql
+select 
+	if(gender = 1, '男性员工', '女性员工') gender,
+	count(*) num
+from emp group by gender 
+```
+
+查询结果:
+
+| gender | num |
+| :----: | :-: |
+|  男性员工  | 28  |
+|  女性员工  |  3  |
 
 # 事务管理
 
