@@ -517,6 +517,38 @@ select concat('%', '王', '%');
 >>> %王%
 ```
 
+## 流程控制函数 case
+
+当有些有特殊含义的数据在数据库中仅以数字等标识，但在查询时又要体现出来，就可以使用 流程控制函数。
+
+语法: `case when 条件表达式1 then result1 when 条件表达式2 then result2 ... else ... end`
+
+示例:
+```mysql
+select 
+	(case
+		when job = 1 then '班主任'
+		when job = 2 then '讲师'
+		when job = 3 then '学工主管'
+		when job = 4 then '教研主管'
+		when job = 5 then '咨询师'
+		else '其他' end) pos,
+	count(*) num
+from emp group by job order by num;
+```
+
+查询结果:
+
+| pos  | num |
+| :--: | :-: |
+| 教研主管 |  1  |
+| 学工主管 |  1  |
+|  其他  |  1  |
+| 班主任  |  7  |
+| 咨询师  |  7  |
+|  讲师  | 14  |
+
+
 # 事务管理
 
 ## 引入
