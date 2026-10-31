@@ -799,3 +799,84 @@ aliyun:
     region: "cn-beijing"
 ```
 
+# 全局异常处理器
+
+由于后端未处理异常，当程序发生异常后，异常层层向上抛，最终由框架拿到后扔给前端一个无法识别的异常，导致前端正确提示错误。
+
+![springboot_全局异常处理器1](img/springboot_全局异常处理器1.png)
+
+按照接口文档，应当返回如下格式:
+
+```json
+{
+	"code": 2,
+	"msg": "error",
+	"data": []
+}
+```
+
+解决方案: 添加 全局异常处理器，将 Controller 层抛出的异常拦截，并返回给前端正确的 json 格式信息。
+
+```java
+/**
+ * 全局异常处理器
+ */
+@Slf4j
+@RestControllerAdvice // 标识全局异常处理器
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler // 标识异常处理方法，默认捕获所有异常
+    public Result handleException(Exception e) {
+        log.error("程序出错了", e);
+        return Result.error("出错了请联系管理员~");
+    }
+}
+```
+
+## 输出具体信息
+
+以添加员工时，电话号码重复为例，终端会报以下信息:
+
+```
+org.springframework.dao.DuplicateKeyException: 
+### Error updating database.  Cause: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '18809091234' for key 'emp.phone'
+### The error may exist in com/itheima/mapper/EmpMapper.xml
+### The error may involve defaultParameterMap
+### The error occurred while setting parameters
+### SQL: insert into emp(username, name, gender, phone, job, salary, image, entry_date, dept_id, create_time, update_time)         values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+### Cause: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '18809091234' for key 'emp.phone'
+; Duplicate entry '18809091234' for key 'emp.phone'
+```
+
+可以发现是 `DuplicateKeyException` 错误，后面有具体的报错信息，代码如下:
+
+```java
+/**
+ * 全局异常处理器
+ */
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler
+    public Result handleException(Exception e) {
+        log.error("程序出错了", e);
+        return Result.error("出错了请联系管理员~");
+    }
+
+    @ExceptionHandler
+    public Result handleDuplicateKeyException(DuplicateKeyException e) {
+        log.error("程序出错了", e);
+        String message = e.getMessage(); // 获取报错信息
+        int i = message.indexOf("Duplicate entry"); // 检索关键词
+        String errMsg = message.substring(i); // 截取信息
+        String[] arr = errMsg.split(" "); // 利用 " " 进行拆分
+        return Result.error(arr[2] + " 已存在"); // 获取电话号码并返回数据
+    }
+}
+```
+
+> [!tips]
+> 系统会根据异常的继承关系，从下往上匹配。
+> 
+> 当遇到 `DuplicateKeyException` 后，会先寻找是否有该异常的处理方法，若没有则寻找其父类，依次向上寻找，直至到达 `Exception`。
