@@ -880,3 +880,63 @@ public class GlobalExceptionHandler {
 > 系统会根据异常的继承关系，从下往上匹配。
 > 
 > 当遇到 `DuplicateKeyException` 后，会先寻找是否有该异常的处理方法，若没有则寻找其父类，依次向上寻找，直至到达 `Exception`。
+
+# 数据库中的数据存入 Map
+
+需求: 统计员工性别人数
+
+```java
+<select id="countEmpJobData" resultType="java.util.Map">
+    select
+        (case
+            when gender = 1 then '男性员工'
+            when gender = 2 then '女性员工'
+            end) gender,
+        count(0) num
+    from emp group by gender;
+</select>
+```
+
+查询结果:
+
+| gender | num |
+| :----: | :-: |
+|  男性员工  | 28  |
+|  女性员工  |  3  |
+
+```java
+// ========= Mapper =========
+// 统计员工性别人数
+List<Map<String, Object>> countEmpGenderData();
+
+/*
+得到的数据格式:
+[
+	{"gender" = 男性员工, "num" = 28},
+	{"gender" = 女性员工, "num" = 3}
+]
+*/
+```
+
+如需将其转换成如下格式
+
+```json
+{
+	'gender': ['男性员工', '女性员工'],
+	'num'= [28, 3]
+}
+```
+
+可以如下操作:
+
+```java
+// 调用 mapper 接口获取统计数据  
+List<Map<String, Object>> list = empMapper.countGenderJobData();
+// 组装结果并返回  
+List<Object> genderList = list.stream().map(dataMap -> dataMap.get("gender")).toList();  
+List<Object> numList = list.stream().map(dataMap -> dataMap.get("num")).toList();  
+```
+
+最后对其进行封装返回即可。
+
+对 `list` 进行 `stream` 流操作，并用 `map` 映射，将其中每一项元素的指定部分取出，最后使用 `toList` 方法将取出的所有元素封装为 `list`。
