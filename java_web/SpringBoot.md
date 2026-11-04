@@ -1009,5 +1009,72 @@ Session 是进阶的 Cookie，也是基于 Cookie 实现的。
 
 **缺点**: 自己实现
 
+## JWT令牌
+
+全称: JSON Web Token ([http://jwt.io/](http://jwt.io/))
+
+定义了一种简洁的、自包含的格式，用在通信双方以 json 数据格式安全的传输信息。
+
+组成:
+1. **Header**: 头，记录 令牌类型、签名算法等。
+   例如: `{"alg":"HS256", "type":"JWT"}`
+2. **Payload**: 有效载荷，携带一些自定义信息、默认信息等。
+   例如: `{"id":"1", "username":"Tom"}`
+3. **Signature**: 签名，防止 Token 被篡改、确保安全性。
+   将 Header、Payload 融入，并加入指定秘钥，通过指定签名算法计算而来。
+
+![springboot_登录校验5](img/springboot_登录校验5.png)
+
+上图中的字符串由各部分信息通过 `Base64` 算法计算得到。
+
+> [!tip] Base64
+> Base64是一种基于64个可打印字符(A-Z a-z 0-9 + /) 来表示二进制数据的编码方式。
+> 
+> 图中的 = 为补位符号。
+
+### 生成/解析
+
+引入依赖
+
+```xml
+<dependency>  
+    <groupId>io.jsonwebtoken</groupId>  
+    <artifactId>jjwt</artifactId>  
+    <version>0.9.1</version>  
+</dependency>
+```
+
+调用官方提供的工具类 Jwts 来生成或解析 jwt 令牌。
+
+```java
+/**  
+ * 生成 JWT 令牌 */@Test  
+public void testGenerateJwt(){  
+    Map<String, Object> dataMap = new HashMap<>();  
+    dataMap.put("id", 1);  
+    dataMap.put("username", "admin");  
+    String jwt = Jwts.builder()  
+            .signWith(SignatureAlgorithm.HS256, "aXRoZWltYQ==") // 指定加密算法,秘钥  
+            .addClaims(dataMap) // 添加自定义信息  
+            .setExpiration(new Date(System.currentTimeMillis() + 3600 * 1000)) // 设置过期时间  
+            .compact(); // 生成令牌  
+    System.out.println(jwt);  
+  
+    // eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImV4cCI6MTc5Mzc5MzIwNX0.eysulL-atple6rN4wdbXYvSWJTB03IQap4BFQQlFHGQ  
+}
+```
+
+```java
+/**  
+ * 解析 JWT 令牌 */@Test  
+public void testParseJWT(){  
+    String token = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImV4cCI6MTc5Mzc5MzIwNX0.eysulL-atple6rN4wdbXYvSWJTB03IQap4BFQQlFHGQ";  
+    Claims claims = Jwts.parser()  
+            .setSigningKey("aXRoZWltYQ==") // 指定秘钥  
+            .parseClaimsJws(token) // 解析令牌  
+            .getBody(); // 获取自定义信息  
+    System.out.println(claims);  
+}
+```
 
 
