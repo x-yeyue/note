@@ -1046,9 +1046,10 @@ Session 是进阶的 Cookie，也是基于 Cookie 实现的。
 
 调用官方提供的工具类 Jwts 来生成或解析 jwt 令牌。
 
+生成 JWT 令牌:
+
 ```java
-/**  
- * 生成 JWT 令牌 */@Test  
+@Test  
 public void testGenerateJwt(){  
     Map<String, Object> dataMap = new HashMap<>();  
     dataMap.put("id", 1);  
@@ -1060,13 +1061,16 @@ public void testGenerateJwt(){
             .compact(); // 生成令牌  
     System.out.println(jwt);  
   
-    // eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImV4cCI6MTc5Mzc5MzIwNX0.eysulL-atple6rN4wdbXYvSWJTB03IQap4BFQQlFHGQ  
+/*
+eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImV4cCI6MTc5Mzc5MzIwNX0.eysulL-atple6rN4wdbXYvSWJTB03IQap4BFQQlFHGQ  
+*/
 }
 ```
 
+解析 JWT 令牌: 
+
 ```java
-/**  
- * 解析 JWT 令牌 */@Test  
+@Test  
 public void testParseJWT(){  
     String token = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImV4cCI6MTc5Mzc5MzIwNX0.eysulL-atple6rN4wdbXYvSWJTB03IQap4BFQQlFHGQ";  
     Claims claims = Jwts.parser()  
@@ -1077,4 +1081,110 @@ public void testParseJWT(){
 }
 ```
 
+### 应用
 
+JWT 令牌工具类:
+
+```java
+public class JwtUtils {
+
+    /** 签名秘钥 */
+    private static final String SIGN_KEY = "aXRoZWltYQ==";
+
+    /** 令牌有效期：12 小时（毫秒） */
+    private static final long EXPIRE_TIME = 12 * 60 * 60 * 1000L;
+
+    /** 工具类禁止实例化 */
+    private JwtUtils() {
+    }
+
+    /**
+     * 生成 JWT 令牌
+     *
+     * @param claims 自定义载荷，例如 {"id": 1, "username": "admin"}
+     * @return 生成的 token 字符串
+     */
+    public static String generateToken(Map<String, Object> claims) {
+        return Jwts.builder()
+                .signWith(SignatureAlgorithm.HS256, SIGN_KEY) // 指定加密算法、秘钥
+                .addClaims(claims)                             // 添加自定义信息
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_TIME)) // 12 小时后过期
+                .compact();
+    }
+
+    /**
+     * 解析 JWT 令牌
+     *
+     * @param token 令牌字符串
+     * @return 载荷 Claims，可通过 claims.get("id") 等方式取值
+     */
+    public static Claims parseToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(SIGN_KEY)   // 指定秘钥
+                .parseClaimsJws(token)     // 解析令牌
+                .getBody();                // 获取载荷
+    }
+}
+```
+
+三层架构:
+
+```java
+// ============== controller ==============
+@Slf4j  
+@RestController  
+@RequestMapping("/login")  
+public class LoginController {  
+  
+    @Autowired  
+    private EmpService empService;  
+  
+    @PostMapping  
+    public Result login(@RequestBody Emp emp){  
+        log.info("登录: {}", emp);  
+        LoginInfo info = empService.login(emp);  
+        if(info != null){  
+            return Result.success(info);  
+        }  
+        return Result.error("用户名或密码错误");  
+    }  
+}
+
+
+// ============== service ==============
+@Override  
+public LoginInfo login(Emp emp) {  
+    // 根据用户名和密码查询员工信息  
+    Emp e = empMapper.selectByUsernameAndPassword(emp);  
+    // 判断是否存在这个员工  
+    // - 存在，组装员工信息    
+    if(e != null){  
+        log.info("登录成功，员工信息: {}", e);  
+  
+        // 生成 JWT 令牌  
+        Map<String, Object> claims = new HashMap<>();  
+        claims.put("id", e.getId());  
+        claims.put("username", e.getUsername());  
+        String jwt = JwtUtils.generateToken(claims);  
+  
+        return new LoginInfo(e.getId(), e.getUsername(), e.getName(), jwt);  
+    }  
+  
+    // - 不存在，返回 null  
+    log.info("登录失败，用户名或密码错误");  
+    return null;  
+}
+
+
+// ============== mapper ==============
+/**  
+ * 根据用户名和密码查询员工信息 * @param emp  
+ * @return  
+ */  
+Emp selectByUsernameAndPassword(Emp emp);
+
+// XML 
+<select id="selectByUsernameAndPassword" resultType="com.itheima.pojo.Emp">  
+    select id, username, name from emp where username = #{username} and password = #{password}  
+</select>
+```
