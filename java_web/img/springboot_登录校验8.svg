@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" width="1600" height="500">
+  <defs>
+    <!-- 阴影效果 -->
+    <filter id="shadow-strong" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="3" dy="5" stdDeviation="4" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    <filter id="shadow-soft" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+    
+    <!-- 箭头定义 -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888888"/>
+    </marker>
+  </defs>
+
+  <!-- 背景底色 -->
+  <rect width="100%" height="100%" fill="#F5F6F7"/>
+
+  <!-- ================= 最外层大虚线框 ================= -->
+  <rect x="15" y="15" width="1570" height="470" rx="15" fill="none" stroke="#888888" stroke-width="1.5" stroke-dasharray="8 6"/>
+
+  <!-- ================= 左侧：浏览器图标及文字 ================= -->
+  <g transform="translate(100, 185)">
+    <!-- Chrome 图标 -->
+    <path d="M50 50 L50 0 A50 50 0 0 1 93.3 75 Z" fill="#EA4335"/>
+    <path d="M50 50 L93.3 75 A50 50 0 0 1 6.7 75 Z" fill="#FBBC05"/>
+    <path d="M50 50 L6.7 75 A50 50 0 0 1 50 0 Z" fill="#34A853"/>
+    <circle cx="50" cy="50" r="23" fill="#4285F4"/>
+    <circle cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="7"/>
+  </g>
+  <text x="150" y="315" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#333333" text-anchor="middle">浏览器</text>
+
+  <!-- ================= 中间：请求与响应箭头 ================= -->
+  <!-- 请求箭头 -->
+  <line x1="240" y1="230" x2="935" y2="230" stroke="#888888" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="580" y="210" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#333333" text-anchor="middle">请求</text>
+  
+  <!-- 响应箭头 -->
+  <line x1="935" y1="315" x2="240" y2="315" stroke="#888888" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="580" y="345" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#333333" text-anchor="middle">响应</text>
+
+  <!-- ================= 右侧：系统模块 ================= -->
+  <!-- 浅蓝色大背景框 -->
+  <rect x="950" y="40" width="590" height="420" rx="15" fill="#7CD2D8" filter="url(#shadow-soft)"/>
+  <!-- 内部虚线框 -->
+  <rect x="965" y="55" width="560" height="390" rx="10" fill="none" stroke="#B3E6E9" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+  <!-- 黄色 Filter 模块 -->
+  <rect x="1000" y="100" width="140" height="255" rx="12" fill="#FFC107" filter="url(#shadow-strong)"/>
+  
+  <!-- 黄色模块内的垂直文字 -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#333333" text-anchor="middle">
+    <text x="1070" y="175">放行前</text>
+    <text x="1070" y="235">放行</text>
+    <text x="1070" y="295">放行后</text>
+  </g>
+
+  <!-- 黄色模块下方的 Filter 文字 -->
+  <text x="1070" y="400" font-family="'Courier New', monospace, sans-serif" font-size="26" fill="#333333" text-anchor="middle">Filter</text>
+
+  <!-- 绿色交互箭头 -->
+  <g fill="#1BA63A">
+    <!-- 指向右侧的箭头 (位于放行位置) -->
+    <path d="M 1180 210 L 1210 210 L 1210 195 L 1235 222.5 L 1210 250 L 1210 235 L 1180 235 Z"/>
+    <!-- 指向左侧的箭头 (位于放行后位置) -->
+    <path d="M 1235 285 L 1205 285 L 1205 270 L 1180 297.5 L 1205 325 L 1205 310 L 1235 310 Z"/>
+  </g>
+
+  <!-- 右侧深色按钮组 -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#FFFFFF" text-anchor="middle">
+    <!-- Login -->
+    <rect x="1255" y="80" width="190" height="65" rx="10" fill="#2F4B5E" filter="url(#shadow-strong)"/>
+    <text x="1350" y="122">Login</text>
+    
+    <!-- Emp -->
+    <rect x="1255" y="170" width="190" height="65" rx="10" fill="#2F4B5E" filter="url(#shadow-strong)"/>
+    <text x="1350" y="212">Emp</text>
+    
+    <!-- Dept -->
+    <rect x="1255" y="260" width="190" height="65" rx="10" fill="#2F4B5E" filter="url(#shadow-strong)"/>
+    <text x="1350" y="302">Dept</text>
+    
+    <!-- Report -->
+    <rect x="1255" y="350" width="190" height="65" rx="10" fill="#2F4B5E" filter="url(#shadow-strong)"/>
+    <text x="1350" y="392">Report</text>
+  </g>
+
+  <!-- 右侧深色按钮组下方的“资源”文字 -->
+  <text x="1350" y="440" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#333333" text-anchor="middle">资源</text>
+
+</svg>

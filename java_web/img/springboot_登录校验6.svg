@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" width="1200" height="500">
+  <defs>
+    <!-- 箭头定义 -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888888"/>
+    </marker>
+    
+    <!-- 阴影效果定义 -->
+    <filter id="strong-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="5" stdDeviation="3" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+    <filter id="soft-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- 最外层大虚线框 -->
+  <rect x="30" y="30" width="1140" height="440" rx="15" fill="#F5F6F7" stroke="#999999" stroke-width="1.5" stroke-dasharray="10 8"/>
+
+  <!-- ================= 左侧：浏览器图标及文字 ================= -->
+  <g transform="translate(90, 190)">
+    <!-- Chrome 图标三个彩色区域 -->
+    <path d="M50 50 L50 0 A50 50 0 0 1 93.3 75 Z" fill="#EA4335"/>
+    <path d="M50 50 L93.3 75 A50 50 0 0 1 6.7 75 Z" fill="#FBBC05"/>
+    <path d="M50 50 L6.7 75 A50 50 0 0 1 50 0 Z" fill="#34A853"/>
+    <!-- 内部蓝圆和白色圆环 -->
+    <circle cx="50" cy="50" r="23" fill="#4285F4"/>
+    <circle cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="7"/>
+  </g>
+  <text x="140" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#333333" text-anchor="middle">浏览器</text>
+
+  <!-- ================= 中间：请求与响应箭头 ================= -->
+  <!-- 请求箭头 -->
+  <line x1="190" y1="220" x2="715" y2="220" stroke="#888888" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="450" y="200" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#333333" text-anchor="middle">请求</text>
+  
+  <!-- 响应箭头 -->
+  <line x1="715" y1="280" x2="190" y2="280" stroke="#888888" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="450" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#333333" text-anchor="middle">响应</text>
+
+  <!-- ================= 右侧：系统模块 ================= -->
+  <!-- 浅蓝色大背景框 -->
+  <rect x="730" y="60" width="410" height="380" rx="15" fill="#7CD2D8" filter="url(#soft-shadow)"/>
+  <!-- 内部虚线框 -->
+  <rect x="745" y="75" width="380" height="350" rx="10" fill="none" stroke="#B3E6E9" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+  <!-- 黄色 Filter 模块 -->
+  <rect x="765" y="110" width="130" height="270" rx="8" fill="#FFC107" filter="url(#strong-shadow)"/>
+  <!-- Filter 文字 -->
+  <text x="830" y="250" font-family="'Courier New', monospace, sans-serif" font-size="24" fill="#333333" text-anchor="middle">Filter</text>
+
+  <!-- 新增：Filter 与按钮之间的绿色交互箭头 -->
+  <g fill="#22B14C">
+    <!-- 指向右侧的箭头 -->
+    <path d="M 902 195 L 922 195 L 922 185 L 938 202.5 L 922 220 L 922 210 L 902 210 Z"/>
+    <!-- 指向左侧的箭头 -->
+    <path d="M 938 265 L 918 265 L 918 255 L 902 272.5 L 918 290 L 918 280 L 938 280 Z"/>
+  </g>
+
+  <!-- 右侧深色按钮组 -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#FFFFFF" text-anchor="middle" font-weight="500">
+    <!-- Login 按钮 -->
+    <rect x="940" y="105" width="160" height="55" rx="10" fill="#2F4B5E" filter="url(#strong-shadow)"/>
+    <text x="1020" y="140">Login</text>
+    
+    <!-- Emp 按钮 -->
+    <rect x="940" y="175" width="160" height="55" rx="10" fill="#2F4B5E" filter="url(#strong-shadow)"/>
+    <text x="1020" y="210">Emp</text>
+    
+    <!-- Dept 按钮 -->
+    <rect x="940" y="245" width="160" height="55" rx="10" fill="#2F4B5E" filter="url(#strong-shadow)"/>
+    <text x="1020" y="280">Dept</text>
+    
+    <!-- Report 按钮 -->
+    <rect x="940" y="315" width="160" height="55" rx="10" fill="#2F4B5E" filter="url(#strong-shadow)"/>
+    <text x="1020" y="350">Report</text>
+  </g>
+</svg>

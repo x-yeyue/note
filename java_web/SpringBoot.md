@@ -1081,6 +1081,9 @@ public void testParseJWT(){
 }
 ```
 
+> [!tip]
+> 在上面代码中使用到的秘钥 `aXRoZWltYQ==` 是 `itheima` 进行 base64 算法加密后的一串字符。
+
 ### 应用
 
 JWT 令牌工具类:
@@ -1188,3 +1191,176 @@ Emp selectByUsernameAndPassword(Emp emp);
     select id, username, name from emp where username = #{username} and password = #{password}  
 </select>
 ```
+
+## 过滤器 Filter
+
+Filter过滤器，是 JavaWeb 三大组件(Servlet、Filter、Listener)之一。
+
+![springboot_登录校验6|816](img/springboot_登录校验6.svg)
+
+过滤器可以把对资源的请求拦截下来、从而实现一些特殊的请求。
+
+过滤器一般完成一些 *通用* 的操作，比如: 登录校验、统一编码处理、敏感字符处理等。
+
+### 快速入门
+
+定义 Filter: 定义一个类，实现 Filter 接口，并实现其所有方法。
+
+配置 Filter: 
+- Filter 类上加 `@WebFilter` 注解，配置拦截路径。
+- 引导类上加上 `@ServletComponentScan` 开启 Servlet 组件支持。
+
+```java
+package com.itheima.filter;
+
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+
+@Slf4j
+@WebFilter(urlPatterns = "/*") // 拦截所有请求
+public class DemoFilter implements Filter { // Filter(of jakarta.servlet)
+    // 初始化方法，web服务器启动时执行，只执行一次
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        log.info("init 初始化方法...");
+    }
+
+    // 拦截到请求之后执行，可执行多次
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        log.info("拦截到了请求...");
+        // 放行
+        chain.doFilter(request, response);
+    }
+
+    // 销毁方法，web服务器关闭时执行，只执行一次
+    @Override
+    public void destroy() {
+        log.info("destroy 销毁方法...");
+    }
+}
+```
+
+```java
+@ServletComponentScan // 开启springboot对servlet组件的支持
+@SpringBootApplication
+public class TliasWebManagementApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(TliasWebManagementApplication.class, args);
+    }
+}
+```
+
+### 实现
+
+工作流程:
+
+![springboot_登录校验7|611](img/springboot_登录校验7.svg)
+
+代码:
+
+```java
+package com.itheima.filter;
+
+import com.itheima.utils.JwtUtils;
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+
+@Slf4j
+@WebFilter(urlPatterns = "/*")
+public class TokenFilter implements Filter {
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse resp = (HttpServletResponse) response;
+
+        // 1. 获取到请求路径
+        String requestURI = req.getRequestURI(); // /login
+
+        // 2. 判断是否是登录请求，如果路径中包含 /login，说明是登录操作，放行
+        if(requestURI.contains("/login")){
+            log.info("登录请求，放行");
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // 3. 获取请求头中的 token
+        String token = req.getHeader("token");
+
+        // 4. 判断 token 是否存在，如果不存在，说明用户没有登录，返回错误信息(响应401状态码)
+        if(token == null || token.isEmpty()){
+            log.info("令牌为空，响应 401 状态吗");
+            resp.setStatus(401);
+            return;
+        }
+
+        // 5. 如果 token 存在，校验令牌，如果校验失败 -> 返回错误信息(响应 401 状态码)
+        try {
+            JwtUtils.parseToken(token);
+        }catch (Exception e){
+            log.info("令牌非法，响应 401 状态吗");
+            resp.setStatus(401);
+            return;
+        }
+
+        // 6. 校验通过，放行
+        log.info("令牌合法，放行");
+        chain.doFilter(request, response);
+    }
+}
+```
+
+### 执行流程
+
+```java
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        log.info("拦截到了请求...");
+        System.out.println("执行放行前的逻辑...");
+        // 放行
+        chain.doFilter(request, response);
+
+        System.out.println("执行放行后的逻辑...");
+    }
+```
+
+![springboot_登录校验8](img/springboot_登录校验8.svg)
+
+1. Filter 首先拦截浏览器的请求，执行放行前的逻辑，如判断是否登录等。
+2. Filter 放行浏览器的请求，访问服务器中的资源。
+3. 回到 Filter 中，继续执行 Filter 放行后的逻辑。
+
+### 拦截路径
+
+```java
+@WebFilter(urlPatterns = "/*")
+public class DemoFilter implements Filter {
+```
+
+常见的拦截资源路径:
+
+|  拦截路径  | urlPatterns值 |          含义           |
+| :----: | :----------: | :-------------------: |
+| 拦截具体路径 |    /login    | 只有访问 /login 路径时，才会拦截  |
+|  目录拦截  |   /emps/*    | 访问 /emps 下的所有资源，都会被拦截 |
+|  拦截所有  |      /*      |     访问所有资源，都会被拦截      |
+
+### 过滤器链
+
+一个 web 应用中，可以配置多个过滤器，这多个过滤器就形成了 **过滤器链**。
+
+![springboot_登录校验9](img/springboot_登录校验9.svg)
+
+顺序: 注解配置的 Filter，优先级是按照过滤器类名(字符串)的自然排序。
+
+例如有 `AbcFilter`、`DemoFilter` 这两个 Filter，同时拦截的都是 `/*`，那么就会先执行 `AbcFilter` 后执行 `DemoFilter`。(将 字符串 "AbcFilter" 和 "DemoFilter" 字典序排序后，"AbcFilter" 更靠前)
