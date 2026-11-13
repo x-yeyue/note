@@ -1255,7 +1255,7 @@ public class TliasWebManagementApplication {
 }
 ```
 
-### 实现
+### 实现令牌校验
 
 工作流程:
 
@@ -1364,3 +1364,203 @@ public class DemoFilter implements Filter {
 顺序: 注解配置的 Filter，优先级是按照过滤器类名(字符串)的自然排序。
 
 例如有 `AbcFilter`、`DemoFilter` 这两个 Filter，同时拦截的都是 `/*`，那么就会先执行 `AbcFilter` 后执行 `DemoFilter`。(将 字符串 "AbcFilter" 和 "DemoFilter" 字典序排序后，"AbcFilter" 更靠前)
+
+## 拦截器 Interceptor
+
+Interceptor 是一种动态拦截方法调用的机制，类似于过滤器。
+
+Spring 框架中提供的，主要用来动态拦截控制器方法的执行。
+
+![springboot_登录校验10](img/springboot_登录校验10.svg)
+
+作用: 拦截请求，在指定方法调用前后，根据业务需要执行预先设定的代码。
+
+### 快速入门
+
+1.  定义拦截器，实现 `HandlerInterceptor` 接口，并实现其所有方法。
+
+```java
+@Slf4j  
+@Component  
+public class DemoInterceptor implements HandlerInterceptor {  
+    // 在目标资源方法(Controller)之前运行 - false 表示拦截，true 表示放行  
+    @Override  
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {  
+        log.info("preHandle...");  
+        return true;  
+    }  
+  
+    // 在目标资源方案运行之后运行  
+    @Override  
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {  
+        log.info("postHandle...");  
+    }  
+  
+    // 视图渲染完毕后运行，使用于 非前后端分离架构
+    @Override  
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {  
+        log.info("afterCompletion...");  
+    }  
+}
+```
+
+2. 注册拦截器。
+
+```java
+/**  
+ * 配置类 
+*/
+@Configuration  // 继承了 @Component
+public class WebConfig implements WebMvcConfigurer {  
+  
+    @Autowired  
+    private DemoInterceptor demoInterceptor;  
+  
+    @Override  
+    public void addInterceptors(InterceptorRegistry registry) {  
+        registry.addInterceptor(demoInterceptor)  // 增加拦截器
+                .addPathPatterns("/**"); // 拦截所有请求  
+    }  
+}
+```
+
+![springboot_登录校验11](img/springboot_登录校验11.png)
+
+### 实现令牌校验
+
+工作流程:
+
+![springboot_登录校验7](img/springboot_登录校验7.svg)
+
+代码: 
+
+```java
+/**
+ * 令牌校验的拦截器
+ */
+@Slf4j
+@Component
+public class TokenInterceptor implements HandlerInterceptor {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 1. 获取到请求路径
+        String requestURI = request.getRequestURI(); // /login
+
+        // 2. 判断是否是登录请求，如果路径中包含 /login，说明是登录操作，放行
+        if(requestURI.contains("/login")){
+            log.info("登录请求，放行");
+            return true;
+        }
+
+        // 3. 获取请求头中的 token
+        String token = request.getHeader("token");
+
+        // 4. 判断 token 是否存在，如果不存在，说明用户没有登录，返回错误信息(响应401状态码)
+        if(token == null || token.isEmpty()){
+            log.info("令牌为空，响应 401 状态吗");
+            response.setStatus(401);
+            return false;
+        }
+
+        // 5. 如果 token 存在，校验令牌，如果校验失败 -> 返回错误信息(响应 401 状态码)
+        try {
+            JwtUtils.parseToken(token);
+        }catch (Exception e){
+            log.info("令牌非法，响应 401 状态吗");
+            response.setStatus(401);
+            return false;
+        }
+
+        // 6. 校验通过，放行
+        log.info("令牌合法，放行");
+        return true;
+    }
+}
+```
+
+### 拦截路径
+
+拦截器可以根据需求，配置不同的拦截路径。
+
+|    拦截路径     |        含义        |                         举例                          |
+| :---------: | :--------------: | :-------------------------------------------------: |
+|    `/*`     |       一级路径       |    能匹配 `/depts` `/emps` `/login`，不能匹配 `/dept/1`     |
+|    `/**`    |      任意级路径       |        能匹配 `/depts` `/depts/1` `/depts/1/2`         |
+| `/depts/*`  | `/depts` 下的一级路径  |      能匹配 `/depts/1`，不能匹配 `/depts/1/2` `/depts`      |
+| `/depts/**` | `/depts` 下的任意级路径 | 能匹配 `/depts` `/depts/1` `/depts/1/2`，不能匹配 `/emps/1` |
+
+通过 `excludePathPatterns()` 方法，可以设置哪些请求不拦截。
+
+```java
+/**
+ * 配置类
+ */
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private TokenInterceptor tokenInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(tokenInterceptor)
+                .addPathPatterns("/**") // 拦截所有请求
+                .excludePathPatterns("/login"); // 不拦截哪些请求
+    }
+}
+```
+
+那么在拦截器的实现代码中的前两步就可以省略。
+
+```java
+/**
+ * 令牌校验的拦截器
+ */
+@Slf4j
+@Component
+public class TokenInterceptor implements HandlerInterceptor {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // // 1. 获取到请求路径
+        // String requestURI = request.getRequestURI(); // /login
+        //
+        // // 2. 判断是否是登录请求，如果路径中包含 /login，说明是登录操作，放行
+        // if(requestURI.contains("/login")){
+        //     log.info("登录请求，放行");
+        //     return true;
+        // }
+
+        // 3. 获取请求头中的 token
+        String token = request.getHeader("token");
+
+        // 4. 判断 token 是否存在，如果不存在，说明用户没有登录，返回错误信息(响应401状态码)
+        if(token == null || token.isEmpty()){
+            log.info("令牌为空，响应 401 状态吗");
+            response.setStatus(401);
+            return false;
+        }
+
+        // 5. 如果 token 存在，校验令牌，如果校验失败 -> 返回错误信息(响应 401 状态码)
+        try {
+            JwtUtils.parseToken(token);
+        }catch (Exception e){
+            log.info("令牌非法，响应 401 状态吗");
+            response.setStatus(401);
+            return false;
+        }
+
+        // 6. 校验通过，放行
+        log.info("令牌合法，放行");
+        return true;
+    }
+}
+```
+
+### 执行流程
+
+![springboot_登录校验12](img/springboot_登录校验12.svg)
+
+## Filter 与 Interceptor 区别
+
+1. 接口规范不同: 过滤器需要实现 Filter 接口，而拦截器需要实现 `HandlerInterceptor` 接口。
+2. 拦截范围不同: 过滤器 Filter 会拦截所有的资源，而 `Interceptor` 只会拦截 Spring 环境中的资源。

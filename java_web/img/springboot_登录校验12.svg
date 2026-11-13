@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2200 600" width="2200" height="600">
+  <defs>
+    <!-- 阴影效果 -->
+    <filter id="shadow-module" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="3" dy="5" stdDeviation="5" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+    <filter id="shadow-button" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    
+    <!-- 灰色箭头定义 -->
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999999"/>
+    </marker>
+  </defs>
+
+  <!-- 背景底色 -->
+  <rect width="100%" height="100%" fill="#FFFFFF"/>
+
+  <!-- ================= 左侧：浏览器图标及文字 ================= -->
+  <g transform="translate(110, 240)">
+    <path d="M50 50 L50 0 A50 50 0 0 1 93.3 75 Z" fill="#EA4335"/>
+    <path d="M50 50 L93.3 75 A50 50 0 0 1 6.7 75 Z" fill="#FBBC05"/>
+    <path d="M50 50 L6.7 75 A50 50 0 0 1 50 0 Z" fill="#34A853"/>
+    <circle cx="50" cy="50" r="23" fill="#4285F4"/>
+    <circle cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="7"/>
+  </g>
+  <text x="160" y="370" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#333333" text-anchor="middle">浏览器</text>
+
+  <!-- ================= Web服务器 大虚线框 ================= -->
+  <rect x="400" y="60" width="1770" height="480" fill="#FCFCFC" stroke="#888888" stroke-width="2" stroke-dasharray="10 8" rx="10"/>
+  <text x="1285" y="575" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#444444" text-anchor="middle" font-weight="bold">Web服务器</text>
+
+  <!-- ================= Spring 内部虚线框 ================= -->
+  <rect x="980" y="80" width="1170" height="430" fill="#F4F4F4" stroke="#CCCCCC" stroke-width="2" stroke-dasharray="8 6" rx="15"/>
+
+  <!-- ================= 1. Filter 模块 ================= -->
+  <g transform="translate(440, 80)">
+    <!-- 黄色主体带阴影 -->
+    <rect x="0" y="0" width="280" height="390" rx="10" fill="#FFC107" filter="url(#shadow-module)"/>
+    <!-- 底部灰色标签 -->
+    <path d="M 0 340 L 280 340 L 280 380 A 10 10 0 0 1 270 390 L 10 390 A 10 10 0 0 1 0 380 Z" fill="#999999"/>
+    
+    <!-- 内部文字 -->
+    <g font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#333333" text-anchor="middle">
+      <text x="140" y="110">放行前逻辑</text>
+      <text x="140" y="210">doFilter()</text>
+      <text x="140" y="310">放行后逻辑</text>
+    </g>
+    <!-- Filter 文字 -->
+    <text x="140" y="375" font-family="'Courier New', monospace" font-size="28" fill="#FFFFFF" text-anchor="middle">Filter</text>
+  </g>
+
+  <!-- 手绘风格的 Tomcat 猫咪图标 (严格参照原图简化版) -->
+  <g transform="translate(450, 480)">
+    <!-- 两只尖耳朵 -->
+    <polygon points="-20,-5 -28,-22 -10,-12" fill="#FDE3A7" stroke="#333" stroke-width="1.5"/>
+    <polygon points="20,-5 28,-22 10,-12" fill="#FDE3A7" stroke="#333" stroke-width="1.5"/>
+    <!-- 扁圆形的脸 -->
+    <path d="M -22 -5 C -22 -18, 22 -18, 22 -5 C 22 12, -22 12, -22 -5 Z" fill="#FDE3A7" stroke="#333" stroke-width="1.5"/>
+    <!-- 黑点眼睛 -->
+    <circle cx="-8" cy="-2" r="2" fill="#333"/>
+    <circle cx="8" cy="-2" r="2" fill="#333"/>
+    <!-- 向外撇的胡须 -->
+    <path d="M -22 3 L -32 1 M -22 7 L -32 7" stroke="#333" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M 22 3 L 32 1 M 22 7 L 32 7" stroke="#333" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- ================= 2. Interceptor 模块 ================= -->
+  <g transform="translate(1050, 100)">
+    <!-- 黄色主体带阴影 -->
+    <rect x="0" y="0" width="280" height="360" rx="10" fill="#FFC107" filter="url(#shadow-module)"/>
+    <!-- 底部灰色标签 -->
+    <path d="M 0 310 L 280 310 L 280 350 A 10 10 0 0 1 270 360 L 10 360 A 10 10 0 0 1 0 350 Z" fill="#999999"/>
+    
+    <!-- 内部文字 -->
+    <g font-family="'Courier New', monospace, sans-serif" font-size="24" fill="#333333" text-anchor="middle">
+      <text x="140" y="90">preHandle</text>
+      <text x="140" y="160">postHandle</text>
+      <text x="140" y="230">afterCompletion</text>
+    </g>
+    <!-- Interceptor 文字 -->
+    <text x="140" y="345" font-family="'Courier New', monospace" font-size="28" fill="#FFFFFF" text-anchor="middle">Interceptor</text>
+  </g>
+
+  <!-- ================= 3. 右侧 Controller 按钮组 ================= -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#FFFFFF" text-anchor="middle">
+    <!-- Controller 1 -->
+    <rect x="1750" y="110" width="240" height="70" rx="35" fill="#2B4A5F" filter="url(#shadow-button)"/>
+    <text x="1870" y="155">Controller</text>
+    
+    <!-- Controller 2 -->
+    <rect x="1750" y="210" width="240" height="70" rx="35" fill="#2B4A5F" filter="url(#shadow-button)"/>
+    <text x="1870" y="255">Controller</text>
+    
+    <!-- Controller 3 -->
+    <rect x="1750" y="310" width="240" height="70" rx="35" fill="#2B4A5F" filter="url(#shadow-button)"/>
+    <text x="1870" y="355">Controller</text>
+    
+    <!-- Controller 4 -->
+    <rect x="1750" y="410" width="240" height="70" rx="35" fill="#2B4A5F" filter="url(#shadow-button)"/>
+    <text x="1870" y="455">Controller</text>
+  </g>
+
+  <!-- ================= 4. Spring Logo ================= -->
+  <g transform="translate(2030, 460)">
+    <path d="M 15 15 C 5 25, 5 35, 15 45 C 25 55, 35 55, 45 45 C 55 35, 55 25, 45 15 C 35 5, 25 5, 15 15 Z M 20 20 C 25 15, 35 15, 40 20 C 35 25, 25 25, 20 20 Z M 20 40 C 25 35, 35 35, 40 40 C 35 45, 25 45, 20 40 Z" fill="#6DB33F"/>
+    <text x="60" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="#6DB33F" font-weight="bold">spring</text>
+  </g>
+
+  <!-- ================= 5. 交互箭头连线 ================= -->
+  <g stroke="#999999" stroke-width="2" fill="none" marker-end="url(#arrow-gray)">
+    <!-- 浏览器 -> Filter -->
+    <line x1="260" y1="280" x2="430" y2="280"/>
+    <!-- Filter -> Interceptor -->
+    <line x1="730" y1="220" x2="1040" y2="220"/>
+    <!-- Interceptor -> Controller -->
+    <line x1="1340" y1="220" x2="1740" y2="220"/>
+    
+    <!-- Controller -> Interceptor (回程) -->
+    <line x1="1740" y1="340" x2="1340" y2="340"/>
+    <!-- Interceptor -> Filter (回程) -->
+    <line x1="1040" y1="340" x2="730" y2="340"/>
+    <!-- Filter -> 浏览器 (回程) -->
+    <line x1="430" y1="340" x2="260" y2="340"/>
+  </g>
+
+</svg>
