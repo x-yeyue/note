@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 800" width="1520" height="800">
+  <defs>
+    <!-- 阴影效果 -->
+    <filter id="card-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.1"/>
+    </filter>
+    <!-- 代码字体族 -->
+    <style>
+      .code { font-family: 'Menlo', 'Consolas', 'Courier New', monospace; font-size: 24px; }
+      .kw { fill: #0033b3; font-weight: bold; } /* 关键字蓝 */
+      .type { fill: #000000; font-weight: bold; } /* 类型黑 */
+      .anno { fill: #9e880d; } /* 注解黄 */
+      .str { fill: #067d17; font-weight: bold; } /* 字符串绿 */
+      .comment { fill: #8c8c8c; } /* 注释灰 */
+      .normal { fill: #000000; } /* 普通黑 */
+      .method { fill: #00627a; font-weight: bold; } /* 方法名深青色 */
+      .handwrite { font-family: 'STKaiti', 'KaiTi', 'SimSun', serif; font-size: 48px; fill: #a80000; font-weight: bold; }
+    </style>
+  </defs>
+
+  <!-- 背景底板 -->
+  <rect x="0" y="0" width="1520" height="800" fill="#f4f5f7"/>
+
+  <!-- 主卡片背景 -->
+  <rect x="50" y="30" width="1420" height="740" rx="20" fill="#ffffff" stroke="#c0c0c0" stroke-width="2" stroke-dasharray="6 4" filter="url(#card-shadow)"/>
+
+  <!-- 方法体浅绿色背景 -->
+  <rect x="75" y="240" width="1370" height="490" rx="5" fill="#d1f2e5" opacity="0.8"/>
+
+  <!-- 切入点表达式黄色高亮背景 -->
+  <rect x="255" y="185" width="485" height="40" rx="5" fill="#fff2cc"/>
+
+  <!-- 包围代码的红色虚线框 -->
+  <rect x="75" y="185" width="1370" height="545" rx="5" fill="none" stroke="#a80000" stroke-width="3" stroke-dasharray="10 6"/>
+
+  <!-- ================= 代码内容 (部分使用 tspan 拼接不同颜色) ================= -->
+  <g class="code">
+    <!-- 第 1 行：@Aspect -->
+    <text x="80" y="100" class="anno">@Aspect</text>
+
+    <!-- 第 2 行：@Component -->
+    <text x="80" y="140" class="anno">@Component</text>
+
+    <!-- 第 3 行：public class ... -->
+    <text x="80" y="200">
+      <tspan class="kw">public</tspan>
+      <tspan class="kw">class</tspan>
+      <tspan class="normal">RecordTimeAspect </tspan>
+      <tspan class="normal">{</tspan>
+    </text>
+
+    <!-- 第 4 行：@Around("...") -->
+    <text x="120" y="240">
+      <tspan class="anno">@Around</tspan>
+      <tspan class="normal">(</tspan>
+      <tspan class="str">"execution(* com.itheima.service.impl.*.*(..))"</tspan>
+      <tspan class="normal">)</tspan>
+    </text>
+
+    <!-- 第 5 行：public Object recordTime(...) -->
+    <text x="120" y="290">
+      <tspan class="kw">public</tspan>
+      <tspan class="type">Object</tspan>
+      <tspan class="method">recordTime</tspan>
+      <tspan class="normal">(ProceedingJoinPoint pjp) </tspan>
+      <tspan class="kw">throws</tspan>
+      <tspan class="normal">Throwable {</tspan>
+    </text>
+
+    <!-- 第 6 行：//1. 记录方法运行的开始时间 -->
+    <text x="180" y="340" class="comment">//1. 记录方法运行的开始时间</text>
+
+    <!-- 第 7 行：long begin = System... -->
+    <text x="180" y="390">
+      <tspan class="kw">long</tspan>
+      <tspan class="normal">begin = System.currentTimeMillis();</tspan>
+    </text>
+
+    <!-- 第 8 行：//2. 执行原始的方法 -->
+    <text x="180" y="440" class="comment">//2. 执行原始的方法</text>
+
+    <!-- 第 9 行：Object result = pjp.proceed(); -->
+    <text x="180" y="490">
+      <tspan class="type">Object</tspan>
+      <tspan class="normal">result = pjp.proceed();</tspan>
+    </text>
+
+    <!-- 第 10 行：//3. 记录方法运行的结束时间，记录耗时 -->
+    <text x="180" y="540" class="comment">//3. 记录方法运行的结束时间，记录耗时</text>
+
+    <!-- 第 11 行：long end = System... -->
+    <text x="180" y="590">
+      <tspan class="kw">long</tspan>
+      <tspan class="normal">end = System.currentTimeMillis();</tspan>
+    </text>
+
+    <!-- 第 12 行：log.info(...) -->
+    <text x="180" y="640">
+      <tspan class="method">log.info</tspan>
+      <tspan class="normal">(</tspan>
+      <tspan class="str">"方法 {} 执行耗时: {}ms"</tspan>
+      <tspan class="normal">, pjp.getSignature() ,end-begin);</tspan>
+    </text>
+
+    <!-- 第 13 行：return result; -->
+    <text x="180" y="690">
+      <tspan class="kw">return</tspan>
+      <tspan class="normal">result;</tspan>
+    </text>
+
+    <!-- 第 14 行：} -->
+    <text x="120" y="740" class="normal">}</text>
+
+    <!-- 第 15 行：} -->
+    <text x="80" y="770" class="normal">}</text>
+  </g>
+
+  <!-- ================= 红色手写体标注 ================= -->
+  
+  <!-- 顶部左侧：切面类 -->
+  <text x="220" y="105" class="handwrite" transform="rotate(-5 220 105)">切面类</text>
+
+  <!-- 顶部中间：切入点表达式 -->
+  <text x="710" y="180" class="handwrite" transform="rotate(-2 710 180)">切入点表达式</text>
+
+  <!-- 中间右侧：通知 -->
+  <text x="1190" y="480" class="handwrite" transform="rotate(5 1190 480)">通知</text>
+
+  <!-- 右侧边缘：切面 -->
+  <text x="1410" y="490" class="handwrite" transform="rotate(90 1410 490)">切面</text>
+
+</svg>

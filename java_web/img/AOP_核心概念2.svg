@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1300" width="1000" height="1300">
+  <defs>
+    <!-- 阴影效果 -->
+    <filter id="card-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="3" dy="5" stdDeviation="6" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+    <!-- 字体样式定义 -->
+    <style>
+      .code { font-family: 'Menlo', 'Consolas', 'Courier New', monospace; font-size: 26px; }
+      .kw { fill: #6C3483; font-weight: bold; } /* 关键字紫色 */
+      .anno { fill: #B7950B; } /* 注解金色 */
+      .type { fill: #000000; } /* 普通类型黑色 */
+      .method { fill: #922B21; font-weight: bold; } /* 方法/变量名深红色 */
+      .normal { fill: #333333; } /* 普通字符深灰 */
+      .handwrite { font-family: 'STKaiti', 'KaiTi', 'SimSun', serif; font-size: 54px; fill: #C0392B; font-weight: bold; }
+    </style>
+  </defs>
+
+  <!-- 背景底板 -->
+  <rect x="0" y="0" width="1000" height="1300" fill="#F5F6F7"/>
+
+  <!-- 卡片外框（带阴影和红色虚线） -->
+  <rect x="40" y="40" width="920" height="1220" rx="15" fill="#FFFFFF" stroke="#C0392B" stroke-width="3" stroke-dasharray="8 6" filter="url(#card-shadow)"/>
+
+  <!-- ================= 浅粉色方法背景色块 ================= -->
+  <!-- 块1：list 方法 -->
+  <rect x="40" y="285" width="920" height="240" fill="#FADBD8" opacity="0.7"/>
+  <!-- 块2：delete 方法 -->
+  <rect x="40" y="555" width="920" height="155" fill="#FADBD8" opacity="0.7"/>
+  <!-- 块3：save 方法 -->
+  <rect x="40" y="740" width="920" height="245" fill="#FADBD8" opacity="0.7"/>
+  <!-- 块4：getById 方法 -->
+  <rect x="40" y="1015" width="920" height="165" fill="#FADBD8" opacity="0.7"/>
+
+  <!-- ================= 代码内容 ================= -->
+  <g class="code">
+    <!-- 行 1: @Service -->
+    <text x="70" y="100" class="anno">@Service</text>
+
+    <!-- 行 2: public class ... -->
+    <text x="70" y="150">
+      <tspan class="kw">public class</tspan>
+      <tspan class="type"> DeptServiceImpl </tspan>
+      <tspan class="kw">implements</tspan>
+      <tspan class="type"> DeptService {</tspan>
+    </text>
+
+    <!-- 行 3: @Autowired -->
+    <text x="110" y="200" class="anno">@Autowired</text>
+
+    <!-- 行 4: private DeptMapper ... -->
+    <text x="110" y="250">
+      <tspan class="kw">private</tspan>
+      <tspan class="type"> DeptMapper </tspan>
+      <tspan class="method">deptMapper</tspan>
+      <tspan class="normal">;</tspan>
+    </text>
+
+    <!-- 行 5: @Override (list) -->
+    <text x="110" y="315" class="anno">@Override</text>
+
+    <!-- 行 6: public List ... -->
+    <text x="110" y="365">
+      <tspan class="kw">public</tspan>
+      <tspan class="type"> List&lt;Dept&gt; </tspan>
+      <tspan class="method">list</tspan>
+      <tspan class="normal">() {</tspan>
+    </text>
+
+    <!-- 行 7: List<Dept> deptList ... -->
+    <text x="170" y="415">
+      <tspan class="type">List&lt;Dept&gt; deptList = </tspan>
+      <tspan class="method">deptMapper.list</tspan>
+      <tspan class="normal">();</tspan>
+    </text>
+
+    <!-- 行 8: return deptList; -->
+    <text x="170" y="465">
+      <tspan class="kw">return</tspan>
+      <tspan class="normal"> deptList;</tspan>
+    </text>
+
+    <!-- 行 9: } -->
+    <text x="110" y="515" class="normal">}</text>
+
+    <!-- 行 10: @Override (delete) -->
+    <text x="110" y="585" class="anno">@Override</text>
+
+    <!-- 行 11: public void delete ... -->
+    <text x="110" y="635">
+      <tspan class="kw">public void</tspan>
+      <tspan class="method"> delete</tspan>
+      <tspan class="normal">(Integer id) {</tspan>
+    </text>
+
+    <!-- 行 12: deptMapper.delete(id); -->
+    <text x="170" y="685">
+      <tspan class="method">deptMapper.delete</tspan>
+      <tspan class="normal">(id);</tspan>
+    </text>
+
+    <!-- 行 13: } -->
+    <text x="110" y="725" class="normal">}</text>
+
+    <!-- 行 14: @Override (save) -->
+    <text x="110" y="770" class="anno">@Override</text>
+
+    <!-- 行 15: public void save ... -->
+    <text x="110" y="820">
+      <tspan class="kw">public void</tspan>
+      <tspan class="method"> save</tspan>
+      <tspan class="normal">(Dept dept) {</tspan>
+    </text>
+
+    <!-- 行 16: dept.setCreateTime ... -->
+    <text x="170" y="870">
+      <tspan class="method">dept.setCreateTime</tspan>
+      <tspan class="normal">(LocalDateTime.</tspan>
+      <tspan class="method">now</tspan>
+      <tspan class="normal">());</tspan>
+    </text>
+
+    <!-- 行 17: dept.setUpdateTime ... -->
+    <text x="170" y="920">
+      <tspan class="method">dept.setUpdateTime</tspan>
+      <tspan class="normal">(LocalDateTime.</tspan>
+      <tspan class="method">now</tspan>
+      <tspan class="normal">());</tspan>
+    </text>
+
+    <!-- 行 18: deptMapper.save(dept); -->
+    <text x="170" y="970">
+      <tspan class="method">deptMapper.save</tspan>
+      <tspan class="normal">(dept);</tspan>
+    </text>
+
+    <!-- 行 19: } -->
+    <text x="110" y="1010" class="normal">}</text>
+
+    <!-- 行 20: @Override (getById) -->
+    <text x="110" y="1045" class="anno">@Override</text>
+
+    <!-- 行 21: public Dept getById ... -->
+    <text x="110" y="1095">
+      <tspan class="kw">public</tspan>
+      <tspan class="type"> Dept </tspan>
+      <tspan class="method">getById</tspan>
+      <tspan class="normal">(Integer id) {</tspan>
+    </text>
+
+    <!-- 行 22: return deptMapper.getById(id); -->
+    <text x="170" y="1145">
+      <tspan class="kw">return</tspan>
+      <tspan class="method"> deptMapper.getById</tspan>
+      <tspan class="normal">(id);</tspan>
+    </text>
+
+    <!-- 行 23: } -->
+    <text x="110" y="1195" class="normal">}</text>
+
+    <!-- 行 24: 类的结束大括号 -->
+    <text x="70" y="1245" class="normal">}</text>
+  </g>
+
+  <!-- ================= 手写红色标注 ================= -->
+  
+  <!-- 目标对象 (右上角) -->
+  <text x="490" y="95" class="handwrite">目标对象</text>
+
+  <!-- 切入点 (左侧，覆盖在代码上) -->
+  <text x="60" y="420" class="handwrite" transform="rotate(-10 60 420)">切入点</text>
+
+  <!-- 连接点 (右侧中下) -->
+  <text x="810" y="810" class="handwrite">连接点</text>
+
+</svg>
