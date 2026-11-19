@@ -306,3 +306,68 @@ public class MyAspect {
     }
 }
 ```
+
+# 案例
+
+需求: 将增、删、改相关接口的操作日志记录到数据库的相应表中。
+
+日志信息包括: 操作人、操作时间、执行方法的全类名、执行方法名、方法运行时参数、返回值、方法执行时长。
+
+```java
+@Slf4j
+@Aspect
+@Component
+public class OperateLogAspect {
+
+    @Autowired
+    private OperateLogMapper operateLogMapper;
+
+    @Around("@annotation(com.itheima.anno.Log)")
+    public Object recordOperateLog(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        long beginTime = System.currentTimeMillis();
+        Object result = null;
+        try {
+            result = joinPoint.proceed();
+            return result;
+        } finally {
+            long costTime = System.currentTimeMillis() - beginTime;
+            // 日志记录失败不能影响业务主流程
+            try {
+                saveLog(joinPoint, result, costTime);
+            } catch (Exception e) {
+                log.error("保存操作日志失败", e);
+            }
+        }
+    }
+
+    /**
+     * 组装并保存日志
+     */
+    private void saveLog(ProceedingJoinPoint joinPoint, Object result, long costTime) {
+        OperateLog operateLog = new OperateLog();
+        // 操作人 ID（登录拦截器已写入 ThreadLocal）
+        operateLog.setOperateEmpId(getCurrentUserId());
+        // 操作时间
+        operateLog.setOperateTime(LocalDateTime.now());
+        // 目标类全类名
+        operateLog.setClassName(joinPoint.getTarget().getClass().getName());
+        // 目标方法名
+        operateLog.setMethodName(joinPoint.getSignature().getName());
+        // 方法参数
+        operateLog.setMethodParams(Arrays.toString(joinPoint.getArgs()));
+        // 返回值
+        operateLog.setReturnValue(result == null ? null : result.toString());
+        // 方法执行耗时（ms）
+        operateLog.setCostTime(costTime);
+
+        operateLogMapper.insert(operateLog);
+
+        log.info("记录操作日志: {}", operateLog);
+    }
+
+    private Integer getCurrentUserId() {
+        return CurrentHolder.getCurrentId();
+    }
+}
+```
