@@ -1564,3 +1564,141 @@ public class TokenInterceptor implements HandlerInterceptor {
 
 1. 接口规范不同: 过滤器需要实现 Filter 接口，而拦截器需要实现 `HandlerInterceptor` 接口。
 2. 拦截范围不同: 过滤器 Filter 会拦截所有的资源，而 `Interceptor` 只会拦截 Spring 环境中的资源。
+
+# 同一线程间传递信息
+
+需求: 将增、删、改相关接口的操作日志记录到数据库的相应表中。
+
+日志信息包括: 操作人、操作时间、执行方法的全类名、执行方法名、方法运行时参数、返回值、方法执行时长。
+
+通过 [AOP](AOP.md) 实现。
+
+由于获取操作人 ID，需要利用到登录时产生的 Jwt 令牌，对其进行解析。
+
+获取到 Token 值就要利用 `ThreadLocal` 来获取。
+
+## ThreadLocal
+
+`ThreadLocal` 不是一个 Thread(线程)，而是 Thread 的局部变量。
+
+`ThreadLocal` 为每个线程提供一份单独的存储空间，具有线程隔离的效果，不同的线程之间不会相互干扰。
+
+简单来说，同一个线程间，通过 `ThreadLocal` 来共享存入其中的数据。
+
+常用方法:
+- `public void set(T value)`: 设置当前线程的线程局部变量的值
+- `public T get()`: 返回当前线程对应的线程局部变量的值
+- `public void remove`: 移除当前线程的线程局部变量
+
+测试:
+
+```java
+public class ThreadLocalTest {
+
+    private static ThreadLocal<String> local = new ThreadLocal<>();
+
+    public static void main(String[] args) {
+        local.set("Main Message"); // 向当前线程存入信息
+
+        new Thread(new Runnable() { // 创建一个子线程
+            @Override
+            public void run() {
+                local.set("Sub Message");  // 向子线程中存入信息
+                System.out.println(Thread.currentThread().getName() + " : " + local.get()); // 获取存入的信息
+
+            }
+        }).start();
+
+        System.out.println(Thread.currentThread().getName() + " : " + local.get()); // 获取存入的信息
+
+        local.remove(); // 删除存入的信息
+
+        System.out.println(Thread.currentThread().getName() + " : " + local.get()); // 获取存入的信息
+    }
+}
+```
+
+输出:
+
+```
+Thread-0 : Sub Message
+main : Main Message
+main : null
+```
+
+## 实现
+
+观察项目的执行流程:
+
+![springboot_ThreadLocal1](img/springboot_ThreadLocal1.svg)
+
+当请求到达服务器后，首先从线程池中获取一个线程，后按照如图流程进行执行，这个完整的请求流程都为同个线程。
+
+在同一个线程中可以利用 `ThreadLocal` 共享存入其中的数据，那么在 TokenFilter 中解析 Jwt 令牌后，将登录的用户 ID 存入其中，那么当需要时再将存入的数据取出即可。
+
+具体操作步骤:
+1. 定义 `ThreadLocal` 操作的工具类，用于操作当前登录员工 ID。
+   ```java
+   package com.itheima.utils;
+
+public class CurrentHolder {
+
+    private static final ThreadLocal<Integer> CURRENT_LOCAL = new ThreadLocal<>();
+
+    public static void setCurrentId(Integer employeeId) {
+        CURRENT_LOCAL.set(employeeId);
+    }
+
+    public static Integer getCurrentId() {
+        return CURRENT_LOCAL.get();
+    }
+
+    public static void remove() {
+        CURRENT_LOCAL.remove();
+    }
+}
+   ```
+2. 在 `TokenFilter` 中，解析完当前登录员工 ID，将其存入 `ThreadLocal` (用完之后需将其删除)。
+   ```java
+   @Slf4j
+@WebFilter(urlPatterns = "/*")
+public class TokenFilter implements Filter {
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse resp = (HttpServletResponse) response;
+		
+		/*
+		参考 过滤器 Filter-实现令牌校验 部分的内容
+		*/
+
+        // 5. 如果 token 存在，校验令牌，如果校验失败 -> 返回错误信息(响应 401 状态码)
+        try {
+            Claims claims = JwtUtils.parseToken(token);
+            Integer empId = Integer.valueOf(claims.get("id").toString());
+            CurrentHolder.setCurrentId(empId);
+            log.info("当前登录员工ID: {}，将其存入 ThreadLocal", empId);
+
+        }catch (Exception e){
+            log.info("令牌非法，响应 401 状态吗");
+            resp.setStatus(401);
+            return;
+        }
+
+        // 6. 校验通过，放行
+        log.info("令牌合法，放行");
+        chain.doFilter(request, response);
+
+        // 7. 删除 ThreadLocal 中的数据
+        CurrentHolder.remove();
+    }
+}
+   ```
+3. 在 AOP 程序中，从 `ThreadLocal` 中获取当前登录员工的 ID。
+   ```java
+    private Integer getCurrentUserId() {
+        return CurrentHolder.getCurrentId();
+    }
+   ```
+   完整 AOP 代码见 [AOP#案例](AOP.md#案例)

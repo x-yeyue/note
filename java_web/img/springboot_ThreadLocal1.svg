@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 400" width="1800" height="400">
+  <defs>
+    <!-- 右向箭头 -->
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666666"/>
+    </marker>
+    <!-- 左向箭头 -->
+    <marker id="arrow-gray-left" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666666"/>
+    </marker>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="100%" height="100%" fill="#FFFFFF"/>
+
+  <!-- ================= 左侧：浏览器图标 ================= -->
+  <g transform="translate(20, 150)">
+    <path d="M50 50 L50 0 A50 50 0 0 1 93.3 75 Z" fill="#EA4335"/>
+    <path d="M50 50 L93.3 75 A50 50 0 0 1 6.7 75 Z" fill="#FBBC05"/>
+    <path d="M50 50 L6.7 75 A50 50 0 0 1 50 0 Z" fill="#34A853"/>
+    <circle cx="50" cy="50" r="23" fill="#4285F4"/>
+    <circle cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="7"/>
+  </g>
+
+  <!-- ================= 中间：大虚线框 ================= -->
+  <rect x="210" y="30" width="1370" height="340" rx="15" fill="none" stroke="#A0A0A0" stroke-width="1.5" stroke-dasharray="8 6"/>
+
+  <!-- ================= 五个实体卡片 (左上/右下圆角，右上/左下直角) ================= -->
+  <g fill="#A5D6D9" stroke="#2C7A85" stroke-width="1.5">
+    <!-- 1. TokenFilter -->
+    <path d="M 280 60 L 430 60 L 430 320 Q 430 340 410 340 L 260 340 L 260 80 Q 260 60 280 60 Z"/>
+    
+    <!-- 2. OperateLogAspect -->
+    <path d="M 540 60 L 690 60 L 690 320 Q 690 340 670 340 L 520 340 L 520 80 Q 520 60 540 60 Z"/>
+    
+    <!-- 3. Controller -->
+    <path d="M 810 60 L 960 60 L 960 320 Q 960 340 940 340 L 790 340 L 790 80 Q 790 60 810 60 Z"/>
+    
+    <!-- 4. Service -->
+    <path d="M 1070 60 L 1220 60 L 1220 320 Q 1220 340 1200 340 L 1050 340 L 1050 80 Q 1050 60 1070 60 Z"/>
+    
+    <!-- 5. Mapper -->
+    <path d="M 1340 60 L 1490 60 L 1490 320 Q 1490 340 1470 340 L 1320 340 L 1320 80 Q 1320 60 1340 60 Z"/>
+  </g>
+
+  <!-- ================= 卡片内文字 ================= -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#333333" text-anchor="middle">
+    <text x="345" y="210">TokenFilter</text>
+    
+    <text x="605" y="195">OperateLog</text>
+    <text x="605" y="225">Aspect</text>
+    
+    <text x="875" y="210">Controller</text>
+    
+    <text x="1135" y="210">Service</text>
+    
+    <text x="1405" y="210">Mapper</text>
+  </g>
+
+  <!-- ================= 右侧：数据库图标 ================= -->
+  <g transform="translate(1680, 140)">
+    <!-- 下半部分柱体 -->
+    <path d="M 0 20 L 0 90 C 0 105, 70 105, 70 90 L 70 20 Z" fill="#C0C0C0"/>
+    <path d="M 0 45 C 0 60, 70 60, 70 45" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+    <path d="M 0 65 C 0 80, 70 80, 70 65" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+    <!-- 顶部椭圆 -->
+    <ellipse cx="35" cy="20" rx="35" ry="15" fill="#C0C0C0" stroke="#999999" stroke-width="1"/>
+    <!-- 侧边线条增强立体感 -->
+    <line x1="0" y1="20" x2="0" y2="90" stroke="#999999" stroke-width="1.5"/>
+    <line x1="70" y1="20" x2="70" y2="90" stroke="#999999" stroke-width="1.5"/>
+  </g>
+
+  <!-- ================= 虚线箭头连线 (简化为两条平行线) ================= -->
+  <g fill="none" stroke="#666666" stroke-width="2" stroke-dasharray="6 4">
+    <!-- 1. 请求箭头 (从浏览器直通右侧数据库) -->
+    <line x1="175" y1="150" x2="1660" y2="150" marker-end="url(#arrow-gray)"/>
+
+    <!-- 2. 响应箭头 (从右侧数据库返回左侧浏览器) -->
+    <line x1="1660" y1="220" x2="175" y2="220" marker-end="url(#arrow-gray-left)"/>
+  </g>
+
+</svg>
