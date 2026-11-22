@@ -307,6 +307,22 @@ public class MyAspect {
 }
 ```
 
+### `joinPoint.getTarget()`
+- **作用**：获取目标对象（代理指向的真实对象）
+- **返回**：`Object`，需要时自行强转，如 `(UserService) target`
+
+### `joinPoint.getSignature()`
+- **作用**：获取目标方法的签名
+- **返回**：`Signature`，再调 `.getName()` 得方法名，`.getDeclaringTypeName()` 得全类名
+
+### `joinPoint.getArgs()`
+- **作用**：获取目标方法的参数
+- **返回**：`Object[]`，可直接 `Arrays.toString(args)` 打印，需要其中参数可强转如 `(Emp) args[0]`
+
+### `pjp.proceed()`（仅 `ProceedingJoinPoint`）
+- **作用**：执行目标方法，决定是否放行
+- **返回**：目标方法的返回值；不调用则目标方法不执行
+
 # 案例
 
 需求: 将增、删、改相关接口的操作日志记录到数据库的相应表中。
